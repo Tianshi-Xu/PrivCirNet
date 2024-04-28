@@ -1,0 +1,53 @@
+dataset: torch/cifar100
+num_classes: 100
+img_size: 32
+mean:
+    - 0.5071
+    - 0.4867
+    - 0.4408
+std:
+    - 0.2675
+    - 0.2565
+    - 0.2761
+crop_pct: 1.0
+scale:
+    - 0.8
+    - 1.0
+interpolation: bicubic
+train_interpolation: random
+aa: rand-m9-mstd0.5-inc1
+mixup: 0.8
+mixup_off_epoch: 175
+mixup_prob: 1.0
+mixup_mode: batch
+mixup_switch_prob: 0.5
+cutmix: 1.0
+reprob: 0.25
+remode: pixel
+amp: True
+batch_size: 256
+lr: 55e-5
+min_lr: 1e-5
+sched: cosine
+weight_decay: 6e-2
+epochs: 150
+cooldown_epochs: 10
+warmup_epochs: 10
+warmup_lr: 0.00001
+opt: adamw
+smoothing: 0.1
+workers: 4
+use_kd: true
+kd_alpha: 4
+seed: 3407
+checkpoint_hist: 3
+finetune: False
+# Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
+budget: 2
+# better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
+better_initialization: True
+fix_blocksize: 1
+log_name: vit_c100_ILP
+teacher: vit_7_4_32_c100
+teacher_checkpoint: pretrained/vit_c100.pth.tar
+initial_checkpoint: pretrained/vit_c100.pth.tar

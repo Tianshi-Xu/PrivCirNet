@@ -1,0 +1,63 @@
+dataset: torch/cifar100
+num_classes: 100
+img_size: 32
+mean:
+    - 0.5071
+    - 0.4867
+    - 0.4408
+std:
+    - 0.2675
+    - 0.2565
+    - 0.2761
+crop_pct: 1.0
+scale:
+    - 0.8
+    - 1.0
+interpolation: bicubic
+train_interpolation: random
+aa: rand-m9-mstd0.5-inc1
+mixup: 0.8
+mixup_off_epoch: 175
+mixup_prob: 1.0
+mixup_mode: batch
+mixup_switch_prob: 0.5
+cutmix: 1.0
+reprob: 0.25
+remode: pixel
+amp: True
+batch_size: 256
+lr: 55e-5
+min_lr: 1e-5
+sched: cosine
+weight_decay: 6e-2
+epochs: 300
+cooldown_epochs: 10
+warmup_epochs: 0
+warmup_lr: 0.00001
+opt: adamw
+smoothing: 0.1
+workers: 8
+use_kd: true
+kd_alpha: 4
+seed: 3407
+checkpoint_hist: 3
+# set fix_blocksize to 2/4/8 to run uniform block_size experiments
+fix_blocksize: 1
+# PrivCirNet
+# b8
+# fix_blocksize_list: 2,2,4,8,4,1,8,8,16,8,1,2,16,16,16,16,16,16,4,16,16,16,16,16,8,8,16,16,16,16,8,16
+# b4
+# fix_blocksize_list: 1,1,2,2,2,1,4,2,4,4,1,1,16,16,16,16,16,16,2,2,16,16,16,16,2,2,16,16,8,16,2,8
+# b2
+# fix_blocksize_list: 1,1,1,1,1,1,2,1,1,1,1,1,8,4,4,8,4,4,1,1,16,8,4,8,1,1,8,4,4,4,1,4
+# Baseline
+# b8
+# fix_blocksize_list: 1,1,8,8,8,1,16,16,16,16,1,1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
+# b4
+# fix_blocksize_list: 1,1,1,4,1,1,16,1,16,4,1,1,16,16,16,16,16,16,1,16,16,16,16,16,16,16,16,16,16,16,1,16
+# b2
+fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,1,1,16,16,16,16,1,16,1,1,16,16,16,16,1,1,16,16,16,16,1,1
+log_name: mbv2_c100_b2_base2
+teacher: c100_mobilenetv2
+teacher_checkpoint: pretrained/mbv2_c100.pth.tar
+initial_checkpoint: pretrained/mbv2_c100.pth.tar
