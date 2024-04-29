@@ -27,7 +27,7 @@ A log file named `vit_c10_ILP.log` will be created to save the configuration and
 
 There are two parameters in the `.yml` file you need to specify:
 - budget. You can set budget to `2`, `4` and `8` whose latency is less than that of networks with uniform block size `2`, `4` and `8`.
-- better_initialization. `True` means use the initialization method proposed in the paper, `False` means use previous initialization method, i.e., $\min |W'-W|_2^2$.
+- better_initialization. `True` means use the initialization method proposed in PrivCirNet, `False` means use previous initialization method, i.e., $\min |W'-W|_2^2$.
 
 ### Train the circulant models
 This step is also simple which is the same as training the original models. The script is `train_cir.sh`. For example , to train ViT on CIFAR-10, you can run the following command:
