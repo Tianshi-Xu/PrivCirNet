@@ -26,7 +26,6 @@ from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pulp import LpVariable,LpProblem,LpInteger,LpMinimize,GLPK_CMD,LpStatus,value
 import pulp
-from src.hess.myhessian import hessian # Hessian computation
 import numpy as np
 import torch
 import torch.nn as nn
@@ -476,7 +475,6 @@ def main():
         scriptable=args.torchscript,
         fix_block_size=args.fix_blocksize,
         ILP=args.better_initialization)
-    
     def _set_module(model, submodule_key, module):
         tokens = submodule_key.split('.')
         sub_tokens = tokens[:-1]
@@ -663,13 +661,12 @@ def main():
                 lr_scheduler=lr_scheduler,
                 amp_autocast=amp_autocast, loss_scaler=loss_scaler, model_ema=model_ema, mixup_fn=mixup_fn,teacher=teacher,loss_fn_kd=train_loss_fn_kd)
     try:
-        ILP(args,loader_eval,model,validate_loss_fn)
+        ILP(args,loader_eval,model)
     except KeyboardInterrupt:
         pass
 
 # ILP function
 def ILP(args,test_loader,model):
-    set_rotate_mat()
     target_block_size = args.budget
     for input, target in test_loader:
         break
@@ -809,14 +806,6 @@ def train_one_epoch(
             loader.mixup_enabled = False
         elif mixup_fn is not None:
             mixup_fn.mixup_enabled = False
-    if epoch <= 10:
-        for layer in model.modules():
-            if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
-                layer.alphas.requires_grad = False
-    else:
-        for layer in model.modules():
-            if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
-                layer.alphas.requires_grad = True
     second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
     batch_time_m = AverageMeter()
     data_time_m = AverageMeter()
@@ -888,9 +877,7 @@ def train_one_epoch(
         end = time.time()
         if args.num_classes == 1000 and batch_idx % 50==0:
             _logger.info("batch_idx:"+str(batch_idx))
-        # if batch_idx>300 and args.num_classes == 200 and "mobile" in args.teacher:
-        #     total_samples = 300
-        #     break
+        # for imagenet, number of samples are 2000
         if batch_idx>2000 and args.num_classes == 1000:
             total_samples = 2000
             break

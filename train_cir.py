@@ -720,14 +720,6 @@ def train_one_epoch(
             loader.mixup_enabled = False
         elif mixup_fn is not None:
             mixup_fn.mixup_enabled = False
-    if epoch <= 10:
-        for layer in model.modules():
-            if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
-                layer.alphas.requires_grad = False
-    else:
-        for layer in model.modules():
-            if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
-                layer.alphas.requires_grad = True
     second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
     batch_time_m = AverageMeter()
     data_time_m = AverageMeter()

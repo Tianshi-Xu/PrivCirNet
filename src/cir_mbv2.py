@@ -142,26 +142,26 @@ class CirMobileNetV2(nn.Module):
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
     
-def cir_nas_mobilenet(n_class, input_size, width_mult,fix_block_size=-1,ILP=False) -> CirMobileNetV2:
-    model = CirMobileNetV2(n_class=n_class, input_size=input_size, width_mult=width_mult,fix_block_size=fix_block_size)
+def cir_mobilenet(n_class, input_size, width_mult,fix_block_size=-1,ILP=False) -> CirMobileNetV2:
+    model = CirMobileNetV2(n_class=n_class, input_size=input_size, width_mult=width_mult,fix_block_size=fix_block_size,ILP=ILP)
     return model
 
 @register_model
-def image_nas_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
-    model=cir_nas_mobilenet(1000,224,1,fix_block_size=fix_block_size,ILP=ILP)
+def image_cir_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
+    model=cir_mobilenet(1000,224,1,fix_block_size=fix_block_size,ILP=ILP)
     return model
 
 @register_model
-def tiny_nas_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
-    model=cir_nas_mobilenet(200,64,1,fix_block_size=fix_block_size,ILP=ILP)
+def tiny_cir_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
+    model=cir_mobilenet(200,64,1,fix_block_size=fix_block_size,ILP=ILP)
     return model
 
 @register_model
-def c100_nas_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
-    model=cir_nas_mobilenet(100,32,1,fix_block_size=fix_block_size,ILP=ILP)
+def c100_cir_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
+    model=cir_mobilenet(100,32,1,fix_block_size=fix_block_size,ILP=ILP)
     return model
 
 @register_model
-def c10_nas_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
-    model=cir_nas_mobilenet(10,32,1,fix_block_size=fix_block_size,ILP=ILP)
+def c10_cir_mobilenetv2(fix_block_size=-1,ILP=False,**kwargs):
+    model=cir_mobilenet(10,32,1,fix_block_size=fix_block_size,ILP=ILP)
     return model

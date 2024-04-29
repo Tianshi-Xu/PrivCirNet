@@ -19,7 +19,7 @@ class CirLinear(nn.Module):
         self.input = None
         search=2
         
-        while search<=64 and in_features %search ==0 and out_features %search ==0:
+        while search<=16 and in_features %search ==0 and out_features %search ==0:
             self.search_space.append(search)
             search *= 2
 
@@ -65,9 +65,9 @@ class CirLinear(nn.Module):
         assert self.fix_block_size!=-1
         if self.fix_block_size!=-1:
             if search_space[-1] < self.fix_block_size:
-                alphas_after=torch.tensor([1 if i==int(math.log2(search_space[-1])) else 0 for i in range(self.alphas.shape[-1])]).to(device)
+                alphas_after=torch.tensor([1 if i==int(math.log2(search_space[-1])) else 0 for i in range(len(search_space))]).to(device)
             else:
-                alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(self.alphas.shape[-1])]).to(device)
+                alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(len(search_space))]).to(device)
         self.alphas_after = alphas_after
         weight=(alphas_after[0]*self.weight).to(device)
         for idx,block_size in enumerate(search_space):
@@ -149,7 +149,7 @@ class CirConv2d(nn.Module):
         self.alphas_after = None
         self.input = None
         search=1
-        while search<=64 and in_features %search ==0 and out_features %search ==0:
+        while search<=16 and in_features %search ==0 and out_features %search ==0:
             self.search_space.append(search)
             search *= 2
         # self.search_space = [self.search_space[-1]]
@@ -182,9 +182,9 @@ class CirConv2d(nn.Module):
         # if fix_block_size, directly use the block size
         if self.fix_block_size!=-1:
             if search_space[-1] < self.fix_block_size:
-                alphas_after=torch.tensor([1 if i==int(math.log2(search_space[-1])) else 0 for i in range(self.alphas.shape[-1])]).to(device)
+                alphas_after=torch.tensor([1 if i==int(math.log2(search_space[-1])) else 0 for i in range(len(search_space))]).to(device)
             else:
-                alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(self.alphas.shape[-1])]).to(device)
+                alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(len(search_space))]).to(device)
         self.alphas_after = alphas_after
         weight=torch.zeros_like(self.weight).to(device)
         for idx,block_size in enumerate(search_space):
@@ -248,7 +248,7 @@ class CirConv2d(nn.Module):
         return x
     
     def extra_repr(self) -> str:
-        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, fix_block_size={self.fix_block_size}, search_space={self.search_space}, separate_weight={self.separate_weight}'
+        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
 
 # make batchnorm layer to be circular, thus we can fuse conv and batchnorm
 class CirBatchNorm2d(nn.BatchNorm2d):
