@@ -12,7 +12,7 @@ We provide PrivCirNet models which can be downloaded [here](https://drive.google
 
 ## Installation
 
-1. Install `torch>=2.0.0`.
+1. Install `torch>=2.0.0`, `python>=3.10`.
 2. Install other pip packages via `pip install -r requirements.txt`.
 3. Prepare the dataset including CIFAR-10, CIFAR100, Tiny ImageNet and ImageNet.
 

@@ -2,8 +2,5 @@ apex==0.9.10dev
 numpy==1.26.4
 PuLP==2.8.0
 PyYAML==6.0.1
-PyYAML==6.0.1
 timm==0.9.16
-torch==2.2.2
-torchvision==0.17.2
 wandb==0.16.6
