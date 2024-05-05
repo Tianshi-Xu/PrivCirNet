@@ -1,5 +1,7 @@
-apex==0.9.10dev
-numpy==1.26.4
+apex==0.9.10.dev0
+fvcore==0.1.5.post20221221
+numpy==1.23.0
+ptflops==0.7.2.2
 PuLP==2.8.0
 PyYAML==6.0.1
 timm==0.9.16
