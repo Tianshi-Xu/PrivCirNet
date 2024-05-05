@@ -25,12 +25,12 @@ cutmix: 1.0
 reprob: 0.25
 remode: pixel
 amp: True
-batch_size: 256
+batch_size: 128
 lr: 55e-5
 min_lr: 1e-5
 sched: cosine
 weight_decay: 6e-2
-epochs: 1
+epochs: 300
 cooldown_epochs: 10
 warmup_epochs: 10
 warmup_lr: 0.00001
@@ -40,13 +40,9 @@ workers: 4
 use_kd: true
 kd_alpha: 4
 seed: 3407
-checkpoint_hist: 1
-# Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
-budget: 2
-# better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: True
-fix_blocksize: 1
-log_name: vit_c10_ILP
+checkpoint_hist: 3
+prune_ratio: 75
+log_name: vit_c10_prune_b4
 teacher: vit_7_4_32
 teacher_checkpoint: pretrained/vit_c10.pth.tar
 initial_checkpoint: pretrained/vit_c10.pth.tar

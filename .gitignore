@@ -1,2 +1,4 @@
 *.log
 output/*
+cal_flops.py
+1.txt

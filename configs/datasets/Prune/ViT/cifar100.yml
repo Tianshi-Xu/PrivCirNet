@@ -25,7 +25,7 @@ cutmix: 1.0
 reprob: 0.25
 remode: pixel
 amp: True
-batch_size: 256
+batch_size: 128
 lr: 55e-5
 min_lr: 1e-5
 sched: cosine
@@ -41,9 +41,8 @@ use_kd: true
 kd_alpha: 4
 seed: 3407
 checkpoint_hist: 3
-# Prune_ratio 75 means 75% of the weights are pruned which is equal to block size=4, set it to 50/75/88 to run experiments
-prune_ratio: 75
-log_name: mbv2_c100_prune_b4
-teacher: c100_mobilenetv2
-teacher_checkpoint: pretrained/mbv2_c100.pth.tar
-initial_checkpoint: pretrained/mbv2_c100.pth.tar
+prune_ratio: 0
+log_name: vit_c100_prune_b1
+teacher: vit_7_4_32_c100
+teacher_checkpoint: pretrained/vit_c100.pth.tar
+initial_checkpoint: pretrained/vit_c100.pth.tar

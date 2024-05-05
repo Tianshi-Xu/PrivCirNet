@@ -42,7 +42,7 @@ from timm.utils import ApexScaler, NativeScaler
 
 from src import *
 from src.cir_layer import CirLinear,CirConv2d,CirBatchNorm2d
-from src.prune_layer import PruneConv2d
+from src.prune_layer import PruneConv2d,PruneLinear
 from src.utils.utils import KLLossSoft
 try:
     from apex import amp
@@ -405,6 +405,19 @@ def main():
         bn_eps=args.bn_eps,
         scriptable=args.torchscript,
         )
+    def _set_module(model, submodule_key, module):
+        tokens = submodule_key.split('.')
+        sub_tokens = tokens[:-1]
+        cur_mod = model
+        for s in sub_tokens:
+            cur_mod = getattr(cur_mod, s)
+        setattr(cur_mod, tokens[-1], module)
+    # For vit, we replace nn.Linear by CirLinear. For MBV2, we directly build the model in cir_mbv2.py
+    if "vit" in args.model:
+        for name,layer in model.named_modules():
+            if isinstance(layer, nn.Linear):
+                hasBias = layer.bias is not None
+                _set_module(model,name,PruneLinear(layer.in_features,layer.out_features,hasBias,args.prune_ratio))
 
     if args.initial_checkpoint:
         load_checkpoint(model, args.initial_checkpoint,strict=False)
@@ -618,7 +631,7 @@ def main():
     total_mul = 0
     total_rot = 0
     for name,layer in model.named_modules():
-        if isinstance(layer, PruneConv2d):
+        if isinstance(layer, PruneConv2d) or isinstance(layer, PruneLinear):
             layer.prune_ratio = args.prune_ratio
             layer.prune_weight()
             # _logger.info("feature size:{}".format(layer.feature_size))
@@ -817,6 +830,7 @@ def validate(model, loader, loss_fn, args, amp_autocast=suppress, log_suffix='')
     last_idx = len(loader) - 1
     with torch.no_grad():
         for batch_idx, (input, target) in enumerate(loader):
+            # print("input.shape:{}".format(input.shape))
             last_batch = batch_idx == last_idx
             if not args.prefetcher:
                 input = input.cuda()

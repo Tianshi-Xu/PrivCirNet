@@ -1,5 +1,7 @@
 import torch.nn as nn
+import torch
 import math
+from ptflops import get_model_complexity_info
 try:
     from timm.models.registry import register_model
 except ImportError:
@@ -165,3 +167,15 @@ def c100_mobilenetv2(**kwargs):
 def c10_mobilenetv2(**kwargs):
     model=mobilenet(10,32,1)
     return model
+
+def cal(net):
+  with torch.cuda.device(0):
+    macs, params = get_model_complexity_info(net, (3, 224, 224), as_strings=True,
+                                            print_per_layer_stat=True, verbose=True)
+    print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
+    print('{:<30}  {:<8}'.format('Number of parameters: ', params))
+
+if __name__ == '__main__':
+    net = image_mobilenetv2()
+    print(net)
+    

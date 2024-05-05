@@ -42,8 +42,8 @@ kd_alpha: 4
 seed: 3407
 checkpoint_hist: 3
 # Prune_ratio 75 means 75% of the weights are pruned which is equal to block size=4, set it to 50/75/88 to run experiments
-prune_ratio: 75
-log_name: mbv2_c10_prune_b4
+prune_ratio: 88
+log_name: mbv2_c10_prune_b8
 teacher: c10_mobilenetv2
 teacher_checkpoint: pretrained/mbv2_c10.pth.tar
 initial_checkpoint: pretrained/mbv2_c10.pth.tar
