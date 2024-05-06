@@ -27,28 +27,16 @@ cutmix: 1.0
 reprob: 0.25
 remode: pixel
 amp: True
-batch_size: 64
+batch_size: 128
 lr: 0.0005
 min_lr: 0.00001
 sched: cosine
 weight_decay: 5e-2
-epochs: 1
+epochs: 300
 cooldown_epochs: 10
 warmup_epochs: 10
 warmup_lr: 0.000001
 opt: adamw
 smoothing: 0.1
-workers: 4
-use_kd: true
-kd_alpha: 4
-seed: 3407
+workers: 8
 checkpoint_hist: 3
-fix_blocksize: 1
-# Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
-budget: 8
-# better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: True
-log_name: vit_tiny_ILP
-teacher: vit_9_12_64
-teacher_checkpoint: pretrained/vit_tiny.pth.tar
-initial_checkpoint: pretrained/vit_tiny.pth.tar

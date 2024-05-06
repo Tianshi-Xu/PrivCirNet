@@ -108,6 +108,15 @@ def vit_7(*args, **kwargs):
 def vit_9(*args, **kwargs):
     return _vit_lite(num_layers=9, num_heads=12, mlp_ratio=2, embedding_dim=192,
                      *args, **kwargs)
+    
+def vit_9_384(*args, **kwargs):
+    return _vit_lite(num_layers=9, num_heads=12, mlp_ratio=2, embedding_dim=384,
+                     *args, **kwargs)
+    
+def vit_9_288(*args, **kwargs):
+    return _vit_lite(num_layers=9, num_heads=12, mlp_ratio=2, embedding_dim=288,
+                     *args, **kwargs)
+
 
 @register_model
 def vit_2_4_32(pretrained=False, progress=False,
@@ -212,6 +221,26 @@ def vit_9_12_64(pretrained=False, progress=False,
                img_size=64, positional_embedding='learnable', num_classes=200,
                *args, **kwargs):
     return vit_9('vit_9_12_64', pretrained, progress,
+                 kernel_size=4,
+                 img_size=img_size, positional_embedding=positional_embedding,
+                 num_classes=num_classes,
+                 *args, **kwargs)  # kernel_size is changed by patch_size
+    
+@register_model
+def vit_9_12_64_384(pretrained=False, progress=False,
+               img_size=64, positional_embedding='learnable', num_classes=200,
+               *args, **kwargs):
+    return vit_9_384('vit_9_12_64_384', pretrained, progress,
+                 kernel_size=4,
+                 img_size=img_size, positional_embedding=positional_embedding,
+                 num_classes=num_classes,
+                 *args, **kwargs)  # kernel_size is changed by patch_size
+    
+@register_model
+def vit_9_12_64_288(pretrained=False, progress=False,
+               img_size=64, positional_embedding='learnable', num_classes=200,
+               *args, **kwargs):
+    return vit_9_288('vit_9_12_64_288', pretrained, progress,
                  kernel_size=4,
                  img_size=img_size, positional_embedding=positional_embedding,
                  num_classes=num_classes,
