@@ -57,7 +57,7 @@ fix_blocksize: 2
 # fix_blocksize_list: 1,16,2,1,1,16,16,1,1,16,16,1,16,16,16,1,16,16,16,1,16,16,16,1,16,16,16,16,16,1
 # b2
 fix_blocksize_list: 1,16,2,1,1,16,2,1,1,16,2,1,1,1,2,1,1,1,2,1,1,1,16,1,16,16,16,1,16,2
-log_name: cvt_c10_b2_base
+log_name: cvt_c10_b2_base_test
 teacher: cvt_7_4_32
 teacher_checkpoint: pretrained/cvt_c10.pth.tar
 initial_checkpoint: pretrained/cvt_c10.pth.tar

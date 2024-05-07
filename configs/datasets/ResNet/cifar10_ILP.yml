@@ -1,0 +1,52 @@
+dataset: torch/cifar10
+num_classes: 10
+img_size: 32
+mean:
+    - 0.4914
+    - 0.4822
+    - 0.4465
+std:
+    - 0.2470
+    - 0.2435
+    - 0.2616
+crop_pct: 1.0
+scale:
+    - 0.8
+    - 1.0
+interpolation: bicubic
+train_interpolation: random
+aa: rand-m9-mstd0.5-inc1
+mixup: 0.8
+mixup_off_epoch: 175
+mixup_prob: 1.0
+mixup_mode: batch
+mixup_switch_prob: 0.5
+cutmix: 1.0
+reprob: 0.25
+remode: pixel
+amp: True
+batch_size: 256
+lr: 55e-5
+min_lr: 1e-5
+sched: cosine
+weight_decay: 6e-2
+epochs: 1
+cooldown_epochs: 10
+warmup_epochs: 10
+warmup_lr: 0.00001
+opt: adamw
+smoothing: 0.1
+workers: 8
+seed: 3407
+checkpoint_hist: 1
+fix_blocksize: 1
+# Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
+budget: 4
+# better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
+better_initialization: True
+log_name: mbv2_c10_ILP
+use_kd: true
+kd_alpha: 4
+teacher: c10_mobilenetv2
+teacher_checkpoint: pretrained/mbv2_c10.pth.tar
+initial_checkpoint: pretrained/mbv2_c10.pth.tar

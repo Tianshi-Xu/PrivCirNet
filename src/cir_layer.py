@@ -116,10 +116,12 @@ class CirLinear(nn.Module):
     def forward(self,x):
         self.input = x.detach()
         # record d1, used for ILP
-        if len(x.shape)==3:
-            self.d1 = x.shape[1]
-        else:
-            self.d1 = 1
+        if self.d1 is None:
+            if len(x.shape)==3:
+                self.d1 = x.shape[1]
+            else:
+                self.d1 = 1
+            print("d1:",self.d1)
         weight = self.trans_to_cir(x.device).to(x.device)
         y = F.linear(x, weight, self.bias)
         return y
