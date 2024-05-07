@@ -483,7 +483,7 @@ def main():
             cur_mod = getattr(cur_mod, s)
         setattr(cur_mod, tokens[-1], module)
         
-    if "vit" in args.model:
+    if "vit" in args.model or "cvt" in args.model:
         for name,layer in model.named_modules():
             if isinstance(layer, nn.Linear):
                 hasBias = layer.bias is not None
@@ -738,7 +738,7 @@ def ILP(args,test_loader,model):
         variable[f"b16_{i}"] = LpVariable(f"b16_{i}", 0, 1, cat=LpInteger)
         # variable[f"b32_{i}"] = LpVariable(f"b32_{i}", 0, 1, cat=LpInteger)
     prob = LpProblem("Block_size", LpMinimize)
-    prob += sum(variable[f"b1_{i}"]*latency_weights_b1[i] +variable[f"b2_{i}"]*latency_weights_b2[i] + variable[f"b4_{i}"]*latency_weights_b4[i] +variable[f"b8_{i}"]*latency_weights_b8[i] +variable[f"b16_{i}"]*latency_weights_b16[i] for i in range(num_variable))-origin_latency*1.15 <= 0.01
+    prob += sum(variable[f"b1_{i}"]*latency_weights_b1[i] +variable[f"b2_{i}"]*latency_weights_b2[i] + variable[f"b4_{i}"]*latency_weights_b4[i] +variable[f"b8_{i}"]*latency_weights_b8[i] +variable[f"b16_{i}"]*latency_weights_b16[i] for i in range(num_variable))-origin_latency*1.2 <= 0.01
 
     
     #one layer only have one blocksize
@@ -792,7 +792,7 @@ def ILP(args,test_loader,model):
             idx += 1
     _logger.info("result:"+str(result))
     _logger.info("origin_latency:"+str(origin_latency))
-    _logger.info("current_latency-origin_latency:"+str(current_latency-origin_latency*1.15))
+    _logger.info("current_latency-origin_latency:"+str(current_latency-origin_latency*1.2))
     
 
 # sample on training dataset and get gradients    

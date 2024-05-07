@@ -48,7 +48,7 @@ fix_blocksize: 1
 budget: 4
 # better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
 better_initialization: True
-log_name: vit_tiny_ILP
-teacher: vit_9_12_64
-teacher_checkpoint: pretrained/vit_tiny.pth.tar
-initial_checkpoint: pretrained/vit_tiny.pth.tar
+log_name: cvt_tiny_ILP
+teacher: cvt_9_12_64
+teacher_checkpoint: pretrained/cvt_tiny.pth.tar
+initial_checkpoint: pretrained/cvt_tiny.pth.tar
