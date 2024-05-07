@@ -68,7 +68,6 @@ class CirLinear(nn.Module):
                 alphas_after=torch.tensor([1 if i==int(math.log2(search_space[-1])) else 0 for i in range(len(search_space))]).to(device)
             else:
                 alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(len(search_space))]).to(device)
-        self.alphas_after = alphas_after
         weight=(alphas_after[0]*self.weight).to(device)
         for idx,block_size in enumerate(search_space):
             if idx==0:
@@ -146,7 +145,6 @@ class CirConv2d(nn.Module):
         self.rotate_mat = {}
         self.rev_rotate_mat = {}
         self.search_space = []
-        self.alphas_after = None
         self.input = None
         search=1
         while search<=16 and in_features %search ==0 and out_features %search ==0:
@@ -185,7 +183,6 @@ class CirConv2d(nn.Module):
                 alphas_after=torch.tensor([1 if i==int(math.log2(search_space[-1])) else 0 for i in range(len(search_space))]).to(device)
             else:
                 alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(len(search_space))]).to(device)
-        self.alphas_after = alphas_after
         weight=torch.zeros_like(self.weight).to(device)
         for idx,block_size in enumerate(search_space):
             if block_size == 1:

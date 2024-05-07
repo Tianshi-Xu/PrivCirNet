@@ -42,7 +42,7 @@ kd_alpha: 4
 seed: 3407
 checkpoint_hist: 3
 # set fix_blocksize to 2/4/8 to run uniform block_size experiments
-fix_blocksize: 1
+fix_blocksize: 2
 # PrivCirNet
 # b8
 # fix_blocksize_list: 16,8,4,2,16,4,4,8,16,4,4,16,16,4,8,16,16,8,8,16,16,16,8,16,16,16,4,16,1
@@ -50,20 +50,14 @@ fix_blocksize: 1
 # fix_blocksize_list: 16,4,1,1,16,2,2,4,8,2,2,4,8,2,4,4,8,2,4,8,16,4,4,16,16,16,4,16,1
 # b2
 # fix_blocksize_list: 16,8,1,1,8,1,1,2,2,1,1,2,2,1,2,2,2,1,2,2,4,2,2,4,4,2,2,16,1
-# beat fp32 b2*1.2
-# fix_blocksize_list: 4,2,1,1,4,1,1,1,2,1,1,2,2,1,1,2,2,1,1,2,4,2,8,2,2,2,1,2,1
-# beat fp32 b2*1.1
-# fix_blocksize_list: 16,2,1,1,8,1,1,2,2,1,1,2,2,1,1,2,2,1,1,2,4,2,1,4,4,2,2,8,1
-# b4*1.2
-fix_blocksize_list: 16,4,2,1,16,2,1,4,8,2,2,4,4,2,2,4,4,2,2,4,16,4,2,8,16,8,2,16,1
 # Baseline
 # b8
-# fix_blocksize_list: 16,16,1,1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,1
+# fix_blocksize_list: 1,16,16,1,1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,1,16,16,16,16,16,1
 # b4
-# fix_blocksize_list: 16,2,1,1,16,16,1,16,16,1,1,16,16,1,1,16,16,16,16,16,16,16,16,16,16,16,16,16,1
+# fix_blocksize_list: 1,16,16,1,1,16,16,1,16,16,16,1,16,16,16,1,16,16,2,1,16,16,16,1,16,16,16,1,16,1
 # b2
-# fix_blocksize_list: 16,1,1,1,16,1,1,1,16,1,1,1,16,1,1,1,16,1,1,16,16,16,1,16,16,16,1,16,1
-log_name: vit_c100_b4_1.2
-teacher: vit_7_4_32_c100
-teacher_checkpoint: pretrained/vit_c100.pth.tar
-initial_checkpoint: pretrained/vit_c100.pth.tar
+fix_blocksize_list: 1,16,2,1,1,16,2,1,1,16,2,1,1,4,2,1,1,1,1,1,1,16,2,1,1,16,16,1,16,1
+log_name: cvt_c100_b2_base
+teacher: cvt_7_4_32_c100
+teacher_checkpoint: pretrained/cvt_c100.pth.tar
+initial_checkpoint: pretrained/cvt_c100.pth.tar

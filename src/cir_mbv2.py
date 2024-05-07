@@ -64,6 +64,7 @@ class CirInvertedResidual(nn.Module):
 
 
 class CirMobileNetV2(nn.Module):
+    # ILP=false in training, fix_block_size=1 is recommended for validation
     def __init__(self, n_class=1000, input_size=224, width_mult=1.0,fix_block_size=-1,ILP=False):
         super(CirMobileNetV2, self).__init__()
         block = CirInvertedResidual

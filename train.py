@@ -41,8 +41,7 @@ from timm.scheduler import create_scheduler
 from timm.utils import ApexScaler, NativeScaler
 
 from src import *
-from src.cir_layer import CirLinear,CirConv2d,CirBatchNorm2d
-from src.utils.utils import KLLossSoft
+
 try:
     from apex import amp
     from apex.parallel import DistributedDataParallel as ApexDDP
@@ -286,23 +285,9 @@ parser.add_argument('--torchscript', dest='torchscript', action='store_true',
                     help='convert model torchscript for inference')
 parser.add_argument('--log-wandb', action='store_true', default=False,
                     help='log training and validation metrics to wandb')
-# KD
-parser.add_argument('--use-kd', action='store_true', default=False,
-                    help='whether to use kd')
-parser.add_argument('--kd-alpha', default=1.0, type=float,
-                    help='KD alpha, soft loss portion (default: 1.0)')
-parser.add_argument('--teacher', default='resnet101', type=str, metavar='MODEL',
-                    help='Name of teacher model (default: "countception"')
-parser.add_argument('--teacher-checkpoint', default='', type=str, metavar='PATH',
-                    help='Initialize teacher model from this checkpoint (default: none)')
-# CIR
-parser.add_argument('--fix_blocksize',type=int, default=-1,
-                    help='whether to use dual skip for resnet blocks')
-parser.add_argument('--fix_blocksize_list', default="",type=str,
-                    help='whether to use dual skip for resnet blocks')
-parser.add_argument('--log_name', default='none', type=str,
-                    help='act sparsification pattern')
-origin_latency = 0
+# Prune
+parser.add_argument('--prune-ratio', type=float, default=0.0)
+
 def _parse_args():
     # Do we have a config file to parse?
     args_config, remaining = config_parser.parse_known_args()
@@ -319,40 +304,18 @@ def _parse_args():
     args_text = yaml.safe_dump(args.__dict__, default_flow_style=False)
     return args, args_text
 
-def create_teacher_model(args):
-    teacher = create_model(
-        args.teacher,
-        pretrained=False,
-        num_classes=args.num_classes,
-        drop_rate=0.,
-        drop_connect_rate=0.,
-        drop_block_rate=0.,
-        global_pool=args.gp,
-        bn_tf=args.bn_tf,
-        bn_momentum=args.bn_momentum,
-        bn_eps=args.bn_eps,
-        # checkpoint_path=args.teacher_checkpoint,
-        # checkpoint_path="",
-    )
-    if args.teacher_checkpoint != "":
-        load_checkpoint(teacher, args.teacher_checkpoint, strict=True)
-    teacher = teacher.eval()
-    return teacher
 
 def main():
     setup_default_logging()
     args, args_text = _parse_args()
-    handler = RotatingFileHandler(args.log_name+'.log', maxBytes=10*1024*1024, backupCount=5)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    _logger.addHandler(handler)
+    
     if args.log_wandb:
         if has_wandb:
             wandb.init(project=args.experiment, config=args)
         else:
             _logger.warning("You've requested to log metrics to wandb but package not found. "
                             "Metrics not being logged to wandb, try `pip install wandb`")
-    _logger.info(args_text)
+
     args.prefetcher = not args.no_prefetcher
     args.distributed = False
     if 'WORLD_SIZE' in os.environ:
@@ -389,11 +352,7 @@ def main():
                         "Install NVIDA apex or upgrade to PyTorch 1.6")
 
     random_seed(args.seed, args.rank)
-    teacher = None
-    if args.use_kd:
-        teacher = create_teacher_model(args)
-        teacher.cuda()
-    _logger.info(teacher)
+
     model = create_model(
         args.model,
         pretrained=args.pretrained,
@@ -407,25 +366,8 @@ def main():
         bn_momentum=args.bn_momentum,
         bn_eps=args.bn_eps,
         scriptable=args.torchscript,
-        fix_block_size=args.fix_blocksize)
-    
-    def _set_module(model, submodule_key, module):
-        tokens = submodule_key.split('.')
-        sub_tokens = tokens[:-1]
-        cur_mod = model
-        for s in sub_tokens:
-            cur_mod = getattr(cur_mod, s)
-        setattr(cur_mod, tokens[-1], module)
-    # For vit, we replace nn.Linear by CirLinear. For MBV2, we directly build the model in cir_mbv2.py
-    if "vit" in args.model or "cvt" in args.model:
-        for name,layer in model.named_modules():
-            if isinstance(layer, nn.Linear):
-                hasBias = layer.bias is not None
-                _set_module(model,name,CirLinear(layer.in_features,layer.out_features,args.fix_blocksize,hasBias))
-
-    if args.initial_checkpoint:
-        load_checkpoint(model, args.initial_checkpoint,strict=False)
-    
+        checkpoint_path=args.initial_checkpoint,
+        prune_ratio=args.prune_ratio)
     if args.num_classes is None:
         assert hasattr(model, 'num_classes'), 'Model must have `num_classes` attr if not set on cmd line/config.'
         args.num_classes = model.num_classes  # FIXME handle model default vs config num_classes more elegantly
@@ -619,32 +561,9 @@ def main():
         train_loss_fn = LabelSmoothingCrossEntropy(smoothing=args.smoothing).cuda()
     else:
         train_loss_fn = nn.CrossEntropyLoss().cuda()
-    train_loss_fn_kd = None
-    if args.use_kd:    
-        train_loss_fn_kd = KLLossSoft().cuda()
-    
     validate_loss_fn = nn.CrossEntropyLoss().cuda()
-    
-    
-    if args.use_kd:
-        _logger.info("Verifying teacher model")
-        validate(teacher, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
-    if args.initial_checkpoint != "":
-        _logger.info("Verifying initial model")
-        validate(model, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
-    
-    # Config the layer-wise block size
-    if args.fix_blocksize_list != "":
-        fix_blocksize_list = [int(x) for x in args.fix_blocksize_list.split(',')]
-        idx = 0
-        for name,layer in model.named_modules():
-            if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
-                layer.fix_block_size = fix_blocksize_list[idx]
-                idx += 1
-            elif isinstance(layer,CirBatchNorm2d):
-                layer.block_size = fix_blocksize_list[idx-1]
+
     # setup checkpoint saver and eval metric tracking
-    
     eval_metric = args.eval_metric
     best_metric = None
     best_epoch = None
@@ -676,7 +595,7 @@ def main():
             train_metrics = train_one_epoch(
                 epoch, model, loader_train, optimizer, train_loss_fn, args,
                 lr_scheduler=lr_scheduler, saver=saver, output_dir=output_dir,
-                amp_autocast=amp_autocast, loss_scaler=loss_scaler, model_ema=model_ema, mixup_fn=mixup_fn,teacher=teacher,loss_fn_kd=train_loss_fn_kd)
+                amp_autocast=amp_autocast, loss_scaler=loss_scaler, model_ema=model_ema, mixup_fn=mixup_fn)
 
             if args.distributed and args.dist_bn in ('broadcast', 'reduce'):
                 if args.local_rank == 0:
@@ -716,12 +635,13 @@ def main():
 def train_one_epoch(
         epoch, model, loader, optimizer, loss_fn, args,
         lr_scheduler=None, saver=None, output_dir=None, amp_autocast=suppress,
-        loss_scaler=None, model_ema=None, mixup_fn=None,teacher=None,loss_fn_kd=None):
+        loss_scaler=None, model_ema=None, mixup_fn=None):
     if args.mixup_off_epoch and epoch >= args.mixup_off_epoch:
         if args.prefetcher and loader.mixup_enabled:
             loader.mixup_enabled = False
         elif mixup_fn is not None:
             mixup_fn.mixup_enabled = False
+
     second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
     batch_time_m = AverageMeter()
     data_time_m = AverageMeter()
@@ -744,14 +664,8 @@ def train_one_epoch(
 
         with amp_autocast():
             output = model(input)
-            if args.use_kd:
-                target_t = teacher(input)
-                loss = loss_fn_kd(output, target_t)
-            else:
-                loss = loss_fn(output, target)
-        
-        reg_loss = 0
-    
+            loss = loss_fn(output, target)
+
         if not args.distributed:
             losses_m.update(loss.item(), input.size(0))
 
@@ -818,7 +732,7 @@ def train_one_epoch(
 
         end = time.time()
         # end for
-    
+
     if hasattr(optimizer, 'sync_lookahead'):
         optimizer.sync_lookahead()
 
@@ -887,6 +801,7 @@ def validate(model, loader, loss_fn, args, amp_autocast=suppress, log_suffix='')
     metrics = OrderedDict([('loss', losses_m.avg), ('top1', top1_m.avg), ('top5', top5_m.avg)])
 
     return metrics
+
 
 if __name__ == '__main__':
     main()
