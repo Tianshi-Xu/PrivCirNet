@@ -45,7 +45,7 @@ finetune: False
 # Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
 budget: 2
 # better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: False
+better_initialization: True
 fix_blocksize: 1
 log_name: cvt_c100_ILP
 teacher: cvt_7_4_32_c100
