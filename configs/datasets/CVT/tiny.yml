@@ -40,3 +40,4 @@ opt: adamw
 smoothing: 0.1
 workers: 8
 checkpoint_hist: 3
+resume: "/home/xts/code/njeans/PrivCirNet/output/train/20240507-190247-cvt_9_12_64-64/last.pth.tar"

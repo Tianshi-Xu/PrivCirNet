@@ -42,7 +42,7 @@ kd_alpha: 4
 seed: 3407
 checkpoint_hist: 3
 # set fix_blocksize to 2/4/8 to run uniform block_size experiments
-fix_blocksize: 8
+fix_blocksize: 4
 # PrivCirNet
 # b8
 # fix_blocksize_list: 2,2,4,4,4,1,8,4,4,4,2,2,16,16,16,16,16,16,4,4,16,16,16,16,16,16,16,16,16,16,16,16
@@ -57,7 +57,7 @@ fix_blocksize: 8
 # fix_blocksize_list: 1,1,4,2,1,1,1,1,1,1,2,1,16,16,16,16,16,16,1,1,16,16,16,16,16,16,16,16,16,16,8,16
 # b2
 # fix_blocksize_list: 1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,16,16,1,1,16,16,16,16,1,1,16,16,16,16,1,16
-log_name: resnet_c10_fixb8
+log_name: resnet_c10_fixb4
 teacher: cifar10_resnet18
 teacher_checkpoint: pretrained/resnet_c10.pth.tar
 initial_checkpoint: pretrained/resnet_c10.pth.tar
