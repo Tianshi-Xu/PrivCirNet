@@ -51,11 +51,11 @@ fix_blocksize: 4
 # b2
 # fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,4,2,1,1,4,4,2,4,2,2,16,4,4,4,2,8
 # Baseline
-# b8
+# b8*1.2
 # fix_blocksize_list: 1,2,1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
-# b4
+# b4*1.2
 # fix_blocksize_list: 1,1,1,1,8,1,16,1,1,16,2,16,2,16,16,16,16,16,16
-# b2
+# b2*1.2
 # fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,2,16,2,2,16,16,16,2,16
 log_name: resnet_c10_fixb4
 teacher: cifar10_resnet18
