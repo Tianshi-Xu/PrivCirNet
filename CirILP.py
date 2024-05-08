@@ -783,14 +783,14 @@ def ILP(args,test_loader,model):
             current_latency += latency_weights_b16[i]
 
     result = np.array(result)
-    print(result.shape)
     idx = 0
     for layer in model.modules():
         if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
             if layer.search_space[-1] < result[idx]:
                 result[idx] = layer.search_space[-1]
             idx += 1
-    _logger.info("result:"+str(result))
+    result_string = ','.join(str(item) for item in result)
+    _logger.info("result: "+str(result_string))
     _logger.info("origin_latency:"+str(origin_latency))
     _logger.info("current_latency-origin_latency:"+str(current_latency-origin_latency))
     

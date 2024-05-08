@@ -45,9 +45,9 @@ seed: 3407
 checkpoint_hist: 3
 fix_blocksize: 1
 # Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
-budget: 4
+budget: 2
 # better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: True
+better_initialization: False
 log_name: cvt_tiny_ILP
 teacher: cvt_9_12_64
 teacher_checkpoint: pretrained/cvt_tiny.pth.tar

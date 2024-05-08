@@ -42,3 +42,4 @@ workers: 4
 seed: 3407
 checkpoint_hist: 3
 use_kd: false
+resume: "/home/xts/code/njeans/PrivCirNet/output/train/20240507-203255-tiny_resnet18-64/last.pth.tar"
