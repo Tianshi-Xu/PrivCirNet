@@ -44,10 +44,10 @@ kd_alpha: 4
 seed: 3407
 checkpoint_hist: 3
 # set fix_blocksize to 2/4/8 to run uniform block_size experiments
-fix_blocksize: 2
+fix_blocksize: 1
 # PrivCirNet
 # b8
-# fix_blocksize_list: 1,16,8,16,4,16,4,4,16,8,2,8,16,8,2,16,16,8,2,16,16,8,2,16,16,8,2,16,16,16,8,8,16,16,8,16,16,2
+fix_blocksize_list: 1,16,8,16,4,16,4,4,16,8,2,8,16,8,2,16,16,8,2,16,16,8,2,16,16,8,2,16,16,16,8,8,16,16,8,16,16,2
 # b4
 # fix_blocksize_list: 1,16,4,2,2,8,2,4,4,4,1,4,8,4,2,8,8,4,1,8,16,4,2,4,8,4,1,4,8,8,2,4,16,4,4,8,16,8
 # b2
@@ -59,7 +59,7 @@ fix_blocksize: 2
 # fix_blocksize_list: 1,16,2,1,1,16,1,1,16,16,1,16,16,16,1,16,16,1,1,16,16,16,1,16,16,16,1,16,16,16,16,16,16,16,16,16,16,8
 # b2
 # fix_blocksize_list: 1,16,1,1,1,16,1,1,16,1,1,16,16,1,1,16,16,1,1,16,16,1,1,16,16,1,1,1,16,16,1,1,16,16,2,1,16,2
-log_name: cvt_tiny_fixb2
+log_name: cvt_tiny_b8
 teacher: cvt_9_12_64
 teacher_checkpoint: pretrained/cvt_tiny.pth.tar
 initial_checkpoint: pretrained/cvt_tiny.pth.tar
