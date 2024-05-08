@@ -27,7 +27,7 @@ cutmix: 1.0
 reprob: 0.25
 remode: pixel
 amp: True
-batch_size: 128
+batch_size: 1024
 lr: 55e-5
 min_lr: 1e-5
 sched: cosine
@@ -43,12 +43,12 @@ seed: 3407
 checkpoint_hist: 1
 fix_blocksize: 1
 # Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
-budget: 4
+budget: 2
 # better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: True
-log_name: mbv2_tiny_ILP
+better_initialization: False
+log_name: resnet_tiny_ILP
 use_kd: true
 kd_alpha: 4
-teacher: tiny_mobilenetv2
-teacher_checkpoint: pretrained/mbv2_tiny.pth.tar
-initial_checkpoint: pretrained/mbv2_tiny.pth.tar
+teacher: tiny_resnet18
+teacher_checkpoint: pretrained/resnet_tiny.pth.tar
+initial_checkpoint: pretrained/resnet_tiny.pth.tar

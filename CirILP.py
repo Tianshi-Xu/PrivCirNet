@@ -807,25 +807,22 @@ def train_one_epoch(
         elif mixup_fn is not None:
             mixup_fn.mixup_enabled = False
     second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
-    batch_time_m = AverageMeter()
     data_time_m = AverageMeter()
     losses_m = AverageMeter()
 
     model.train()
-
     end = time.time()
     last_idx = len(loader) - 1
     num_updates = epoch * len(loader)
     optimizer.zero_grad()
     total_samples = len(loader.dataset)
+    loss = 0
     for batch_idx, (input, target) in enumerate(loader):
         if args.num_classes == 1000 and batch_idx % 2==1:
             continue
         if batch_idx>6000 and args.num_classes == 1000:
             total_samples = 3000
             break
-        last_batch = batch_idx == last_idx
-        data_time_m.update(time.time() - end)
         if not args.prefetcher:
             input, target = input.cuda(), target.cuda()
             if mixup_fn is not None:
@@ -841,10 +838,13 @@ def train_one_epoch(
             else:
                 loss = loss_fn(output, target)
         # _logger.info("loss:"+str(loss.item()))
-        if not args.distributed:
-            losses_m.update(loss.item(), input.size(0))
 
-
+        if args.num_classes == 1000 and batch_idx % 50==0:
+            _logger.info("batch_idx:"+str(batch_idx))
+        # for imagenet, number of samples are 2000
+        
+        # end for
+        # break
         if loss_scaler is not None:
             loss_scaler(
                 loss, optimizer,
@@ -857,42 +857,20 @@ def train_one_epoch(
                 dispatch_clip_grad(
                     model_parameters(model, exclude_head='agc' in args.clip_mode),
                     value=args.clip_grad, mode=args.clip_mode)
-
-        if model_ema is not None:
-            model_ema.update(model)
-
-        torch.cuda.synchronize()
-        num_updates += 1
-        batch_time_m.update(time.time() - end)
-        if last_batch or batch_idx % args.log_interval == 0:
-            lrl = [param_group['lr'] for param_group in optimizer.param_groups]
-            lr = sum(lrl) / len(lrl)
-
-            if args.distributed:
-                reduced_loss = reduce_tensor(loss.data, args.world_size)
-                losses_m.update(reduced_loss.item(), input.size(0))
-
-        if saver is not None and args.recovery_interval and (
-                last_batch or (batch_idx + 1) % args.recovery_interval == 0):
-            saver.save_recovery(epoch, batch_idx=batch_idx)
-
-        if lr_scheduler is not None:
-            lr_scheduler.step_update(num_updates=num_updates, metric=losses_m.avg)
-
-        end = time.time()
-        if args.num_classes == 1000 and batch_idx % 50==0:
-            _logger.info("batch_idx:"+str(batch_idx))
-        # for imagenet, number of samples are 2000
+        # print("------------------")
+        # for param in model.parameters():
+        #     if param.grad is not None:
+        #         _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
         
-        # end for
-    
+        
     if hasattr(optimizer, 'sync_lookahead'):
         optimizer.sync_lookahead()
     _logger.info("len loader.dataset:"+str(total_samples))
     for param in model.parameters():
         if param.grad is not None:
-            param.grad.data /= total_samples
             # _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
+            param.grad.data /= total_samples
+            # _logger.info("mean grad2:"+str(torch.mean(param.grad.data)))
     return OrderedDict([('loss', losses_m.avg)])
 
 def validate(model, loader, loss_fn, args, amp_autocast=suppress, log_suffix=''):

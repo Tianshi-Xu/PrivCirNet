@@ -211,8 +211,10 @@ class CirConv2d(nn.Module):
                     self.grad = self.weight.grad.clone()
                 lambda_tmp = self.grad.reshape(q, block_size, p, block_size, self.kernel_size,self.kernel_size)
                 lambda_tmp = lambda_tmp.permute(0, 2, 1, 3,4,5)
+                # print("grad^2.mean:",lambda_tmp.mean())
                 lambda_tmp = lambda_tmp * 1e5
                 lambda_tmp = lambda_tmp ** 2
+                # print("grad^2.mean:",lambda_tmp.mean())
                 
                 # print(lambda_tmp[0,0,:,:,0,0])
                 lambda_rot = lambda_tmp[:,:, rotate_mat[:, 0], rotate_mat[:, 1],:,:]
