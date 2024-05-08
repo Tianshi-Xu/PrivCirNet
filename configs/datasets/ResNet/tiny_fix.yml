@@ -43,7 +43,7 @@ seed: 3407
 checkpoint_hist: 3
 use_kd: true
 kd_alpha: 4
-fix_blocksize: 8
+fix_blocksize: 2
 # PrivCirNet
 # b8
 # fix_blocksize_list: 2,2,4,4,2,1,16,16,16,16,1,2,16,16,16,16,16,16,4,16,16,16,16,16,16,8,16,16,16,16,16,16
@@ -58,7 +58,7 @@ fix_blocksize: 8
 # fix_blocksize_list: 1,1,1,1,1,1,16,16,16,16,1,1,16,16,16,16,16,16,1,16,16,16,16,16,1,16,16,16,16,16,16,16
 # b2
 # fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,1,1,16,16,16,16,16,16,1,1,16,16,1,16,1,1,16,16,16,16,1,1
-log_name: resnet_tiny_fixb8
+log_name: resnet_tiny_fixb2
 teacher: tiny_resnet18
 teacher_checkpoint: pretrained/resnet_tiny.pth.tar
 initial_checkpoint: pretrained/resnet_tiny.pth.tar

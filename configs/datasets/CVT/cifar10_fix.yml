@@ -42,7 +42,7 @@ kd_alpha: 4
 seed: 3407
 checkpoint_hist: 3
 # set fix_blocksize to 2/4/8 to run uniform block_size experiments
-fix_blocksize: 2
+fix_blocksize: 1
 # PrivCirNet
 # b8
 # fix_blocksize_list: 1,16,8,2,2,16,8,2,4,16,8,2,8,16,4,4,16,16,16,4,16,16,16,4,16,16,16,8,16,2
