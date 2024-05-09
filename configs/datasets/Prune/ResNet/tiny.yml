@@ -43,8 +43,8 @@ seed: 3407
 checkpoint_hist: 3
 use_kd: false
 
-prune_ratio: 88
-log_name: resnet_tiny_prune_b8
+prune_ratio: 75
+log_name: resnet_tiny_prune_b4
 teacher: tiny_resnet18
 teacher_checkpoint: pretrained/resnet_tiny.pth.tar
 initial_checkpoint: pretrained/resnet_tiny.pth.tar

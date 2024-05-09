@@ -41,8 +41,8 @@ use_kd: false
 seed: 3407
 checkpoint_hist: 3
 
-prune_ratio: 88
-log_name: resnet_c10_prune_b8
+prune_ratio: 75
+log_name: resnet_c10_prune_b4
 teacher: cifar10_resnet18
 teacher_checkpoint: pretrained/resnet_c10.pth.tar
 initial_checkpoint: pretrained/resnet_c10.pth.tar
