@@ -32,19 +32,17 @@ sched: cosine
 weight_decay: 6e-2
 epochs: 300
 cooldown_epochs: 10
-warmup_epochs: 10
+warmup_epochs: 0
 warmup_lr: 0.00001
 opt: adamw
 smoothing: 0.1
-workers: 4
-use_kd: true
-kd_alpha: 4
+workers: 8
+use_kd: false
 seed: 3407
 checkpoint_hist: 3
-# Prune_ratio 75 means 75% of the weights are pruned which is equal to block size=4, set it to 50/75/88 to run experiments
-prune_ratio: 50/75/88
-log_name: mbv2_c10_prune_b8
-teacher: c10_mobilenetv2
-teacher_checkpoint: pretrained/mbv2_c10.pth.tar
-initial_checkpoint: pretrained/mbv2_c10.pth.tar
-# resume: ""
+
+prune_ratio: 88
+log_name: resnet_c10_prune_b8
+teacher: cifar10_resnet18
+teacher_checkpoint: pretrained/resnet_c10.pth.tar
+initial_checkpoint: pretrained/resnet_c10.pth.tar

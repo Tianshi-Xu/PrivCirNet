@@ -332,6 +332,7 @@ def next_power_2(d):
 
 # cal_rot and cal_latency are used to compute latency of each layer, each block size
 def cal_rot(n,m,d1,d2,b):
+    # _logger.info("n,m,d1,d2,b: %d %d %d %d %d",n,m,d1,d2,b)
     min_rot = 1e8
     d_min = int(min(d2/b,d1/b))
     final_mp = 0
@@ -350,7 +351,7 @@ def cal_rot(n,m,d1,d2,b):
                         break
                     i+=1
                 m_p=i-1
-            if d>d_min or m_p>m:
+            if d>d_min or m_p>m or m_p<=0:
                 continue
             if b!=1:
                 next_pow_2 = next_power_2(m_p*b)
@@ -361,17 +362,35 @@ def cal_rot(n,m,d1,d2,b):
                 min_rot=tmp
                 final_d=d
                 final_mp = m_p
-
+    # _logger.info("final_mp,final_d: %d %d",final_mp,final_d)
     mul = math.ceil(1.0*m/final_mp)*math.ceil(1.0*d1/b/final_d)*math.ceil(1.0*d2/b/final_d)*final_d
     return min_rot, mul
 
-def cal_latency(HW,C,K,b,space,args):
+def cal_latency(layer,HW,C,K,b,space,args):
+    # _logger.info("HW,C,K,b: %d %d %d %d",HW,C,K,b)
     if space[-1]<b:
         b = space[-1]
-    N=8192
-    rot, mul = cal_rot(N,HW,C,K,b)
+    n=8192
+    num_m=1
+    if layer.padding!=0:
+        power2 = next_power_2(HW*b)
+        if power2>n:
+            num_m=int(math.ceil(power2/n))
+            mp = n
+        else:
+            mp = power2
+        n=int(math.floor(n/mp))
+        C = C//b
+        K = K//b
+        b = 1
+        HW=1
+        # _logger.info("hw,n,C,K,b: %d %d %d %d %d",HW,n,C,K,b)
+    rot, mul = cal_rot(n,HW,C,K,b)
+    rot = rot*num_m
+    mul = mul*num_m
+    # _logger.info("rot, mul: %d %d",rot,mul)
     if "vit" in args.model:
-        mul = HW*C*K/(N*b)
+        mul = HW*C*K/(n*b)
     return torch.tensor(rot+0.135*mul).item()
 
 # compute |W'-W|^2
@@ -696,7 +715,7 @@ def ILP(args,test_loader,model):
     for layer in model.modules():
         if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
             space = layer.search_space
-            origin_latency += cal_latency(layer.d1,layer.in_features,layer.out_features,target_block_size,space,args)
+            origin_latency += cal_latency(layer,layer.d1,layer.in_features,layer.out_features,target_block_size,space,args)
             cir_idx.append(idx)
             # delta_weights_b1 = |W'-W|^2
             delta_weights_b1.append(0)
@@ -712,11 +731,11 @@ def ILP(args,test_loader,model):
             sensitivity_b8.append(cal_delta_fim_w(layer,8,space,device))
             sensitivity_b16.append(cal_delta_fim_w(layer,16,space,device))
                   
-            latency_weights_b1.append(cal_latency(layer.d1,layer.in_features,layer.out_features,1,space,args))
-            latency_weights_b2.append(cal_latency(layer.d1,layer.in_features,layer.out_features,2,space,args))
-            latency_weights_b4.append(cal_latency(layer.d1,layer.in_features,layer.out_features,4,space,args))
-            latency_weights_b8.append(cal_latency(layer.d1,layer.in_features,layer.out_features,8,space,args))
-            latency_weights_b16.append(cal_latency(layer.d1,layer.in_features,layer.out_features,16,space,args))
+            latency_weights_b1.append(cal_latency(layer,layer.d1,layer.in_features,layer.out_features,1,space,args))
+            latency_weights_b2.append(cal_latency(layer,layer.d1,layer.in_features,layer.out_features,2,space,args))
+            latency_weights_b4.append(cal_latency(layer,layer.d1,layer.in_features,layer.out_features,4,space,args))
+            latency_weights_b8.append(cal_latency(layer,layer.d1,layer.in_features,layer.out_features,8,space,args))
+            latency_weights_b16.append(cal_latency(layer,layer.d1,layer.in_features,layer.out_features,16,space,args))
             idx+=1
         elif isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
             idx+=1
@@ -726,6 +745,12 @@ def ILP(args,test_loader,model):
     _logger.info("delta_weights_b4:"+str(delta_weights_b4))
     _logger.info("delta_weights_b8:"+str(delta_weights_b8))
     _logger.info("delta_weights_b16:"+str(delta_weights_b16))
+    
+    _logger.info("latency_weights_b1:"+str(latency_weights_b1))
+    _logger.info("latency_weights_b2:"+str(latency_weights_b2))
+    _logger.info("latency_weights_b4:"+str(latency_weights_b4))
+    _logger.info("latency_weights_b8:"+str(latency_weights_b8))
+    _logger.info("latency_weights_b16:"+str(latency_weights_b16))
     
     _logger.info("cir_idx:"+str(cir_idx))
     num_variable = len(cir_idx)

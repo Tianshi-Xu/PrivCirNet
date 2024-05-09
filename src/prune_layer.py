@@ -87,14 +87,24 @@ class PruneConv2d(nn.Module):
         p = math.ceil(math.log2(d))
         return int(pow(2,p))
 
-    # cal_rot and comm are used to compute latency of each layer, each block size
+    # cal_rot and cal_d are used to compute latency of each layer, each block size
     def cal_d(self):
         n = 8192
-        m = self.feature_size ** 2
+        m = (self.feature_size+self.padding*2) ** 2
         d1 = self.in_features
         d2 = self.out_features
         b=1
         min_rot = 1e8
+        num_m=1
+        if self.padding !=0:
+            pow2 = self.next_power_2(m)
+            if pow2 > n:
+                num_m=int(math.ceil(pow2/n))
+                mp = n
+            else:
+                mp = pow2
+            m=1
+            n=int(math.floor(n/mp))
         d_min = int(min(d2/b,d1/b))
         final_mp = 0
         final_d = 0
@@ -114,7 +124,7 @@ class PruneConv2d(nn.Module):
                             break
                         i+=1
                     m_p=i-1
-                if d>d_min or m_p>m:
+                if d>d_min or m_p>m or m_p<=0:
                     continue
                 if b!=1:
                     next_pow_2 = self.next_power_2(m_p*b)
@@ -132,6 +142,8 @@ class PruneConv2d(nn.Module):
         # print("n,m,d1,d2,b:",n,m,d1,d2,b)
         # print("final_mp,final_d:",final_mp,final_d)
         mul = math.ceil(1.0*m/final_mp)*math.ceil(1.0*d1/b/final_d)*math.ceil(1.0*d2/b/final_d)*final_d
+        min_rot*=num_m
+        mul*=num_m
         self.mul = mul
         return [final_d,final_ri,final_ro,min_rot]
     

@@ -241,15 +241,16 @@ class CirConv2d(nn.Module):
         if self.feature_size is None:
             assert x.size(2) == x.size(3)
             self.feature_size = x.size(2)
-            self.d1 = self.feature_size ** 2
+            self.d1 = (self.feature_size+self.padding*2) ** 2
             print("feature_size:",self.feature_size)
+            print("d1:",self.d1)
         self.input = x.detach()
         weight=self.trans_to_cir(x.device)
         x = F.conv2d(x,weight,None,self.stride,self.padding)
         return x
     
     def extra_repr(self) -> str:
-        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
+        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, stride={self.stride}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
 
 # make batchnorm layer to be circular, thus we can fuse conv and batchnorm
 class CirBatchNorm2d(nn.BatchNorm2d):
