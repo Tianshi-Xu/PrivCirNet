@@ -41,8 +41,8 @@ smoothing: 0.1
 workers: 8
 checkpoint_hist: 3
 
-prune_ratio: 75
-log_name: cvt_tiny_prune_b4
+prune_ratio: 88
+log_name: cvt_tiny_prune_b8
 teacher: cvt_9_12_64
 teacher_checkpoint: pretrained/cvt_tiny.pth.tar
 initial_checkpoint: pretrained/cvt_tiny.pth.tar
