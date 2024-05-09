@@ -40,8 +40,8 @@ workers: 4
 seed: 3407
 checkpoint_hist: 3
 
-prune_ratio: 75
-log_name: cvt_c100_prune_b4
+prune_ratio: 88
+log_name: cvt_c100_prune_b8
 teacher: cvt_7_4_32_c100
 teacher_checkpoint: pretrained/cvt_c100.pth.tar
 initial_checkpoint: pretrained/cvt_c100.pth.tar
