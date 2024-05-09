@@ -413,9 +413,11 @@ def main():
             cur_mod = getattr(cur_mod, s)
         setattr(cur_mod, tokens[-1], module)
     # For vit, we replace nn.Linear by CirLinear. For MBV2, we directly build the model in cir_mbv2.py
-    if "vit" in args.model:
+    if "vit" in args.model or "cvt" in args.model:
         for name,layer in model.named_modules():
             if isinstance(layer, nn.Linear):
+                if layer.out_features == 1:
+                    continue
                 hasBias = layer.bias is not None
                 _set_module(model,name,PruneLinear(layer.in_features,layer.out_features,hasBias,args.prune_ratio))
 
