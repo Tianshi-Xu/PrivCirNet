@@ -50,15 +50,15 @@ fix_blocksize: 1
 # b4
 # fix_blocksize_list: 1,1,1,1,4,2,8,2,8,16,4,16,8,8,16,2,16,2,16
 # b2
-# fix_blocksize_list: 1,1,1,1,2,1,4,1,2,4,2,16,2,2,2,2,8,2,8
+fix_blocksize_list: 1,1,1,1,2,1,4,1,2,4,2,16,2,2,2,2,8,2,8
 # baseline
 # b8
 # fix_blocksize_list: 16,2,1,8,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
 # b4
 # fix_blocksize_list: 1,1,4,1,16,1,16,1,2,16,16,16,16,16,16,2,16,2,16
 # b2
-fix_blocksize_list: 1,1,1,1,1,1,8,1,1,16,2,16,2,2,16,2,16,2,16
-log_name: resnet_tiny_b2_base
+# fix_blocksize_list: 1,1,1,1,1,1,8,1,1,16,2,16,2,2,16,2,16,2,16
+log_name: resnet_tiny_b2
 teacher: tiny_resnet18
 teacher_checkpoint: pretrained/resnet_tiny.pth.tar
 initial_checkpoint: pretrained/resnet_tiny.pth.tar
