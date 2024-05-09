@@ -623,9 +623,9 @@ def main():
     
     validate_loss_fn = nn.CrossEntropyLoss().cuda()
     
-    if args.use_kd:
-        _logger.info("Verifying teacher model")
-        validate(teacher, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
+    # if args.use_kd:
+    #     _logger.info("Verifying teacher model")
+    #     validate(teacher, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
     if args.initial_checkpoint != "":
         _logger.info("Verifying initial model")
         validate(model, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
