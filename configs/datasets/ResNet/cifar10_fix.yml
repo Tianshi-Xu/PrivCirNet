@@ -52,12 +52,12 @@ fix_blocksize: 1
 # fix_blocksize_list: 1,1,1,1,2,1,1,1,1,2,1,2,1,4,8,8,16,8,16
 # Baseline
 # b8
-# fix_blocksize_list: 4,1,2,8,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
+fix_blocksize_list: 4,1,2,8,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
 # b4
 # fix_blocksize_list: 16,1,1,1,16,1,2,1,16,16,16,16,16,16,16,16,16,16,16
 # b2
-fix_blocksize_list: 1,1,1,1,2,1,1,1,1,16,1,1,1,1,16,16,16,16,16
-log_name: resnet_c10_b2_base
+# fix_blocksize_list: 1,1,1,1,2,1,1,1,1,16,1,1,1,1,16,16,16,16,16
+log_name: resnet_c10_b8_base_2
 teacher: cifar10_resnet18
 teacher_checkpoint: pretrained/resnet_c10.pth.tar
 initial_checkpoint: pretrained/resnet_c10.pth.tar
