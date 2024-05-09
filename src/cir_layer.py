@@ -250,7 +250,11 @@ class CirConv2d(nn.Module):
         return x
     
     def extra_repr(self) -> str:
+<<<<<<< HEAD
         return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, stride={self.stride}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
+=======
+        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size},stride={self.stride}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
+>>>>>>> 74b6c5caf6a5482f738184d9ce657699a2728d1a
 
 # make batchnorm layer to be circular, thus we can fuse conv and batchnorm
 class CirBatchNorm2d(nn.BatchNorm2d):

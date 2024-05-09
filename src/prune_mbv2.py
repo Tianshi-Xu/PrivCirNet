@@ -145,6 +145,11 @@ def prune_mobilenet(n_class, input_size, width_mult,prune_ratio=0) -> PruneMobil
     return model
 
 @register_model
+def image_prune_mobilenetv2(prune_ratio=0,**kwargs):
+    model=prune_mobilenet(1000,224,1,prune_ratio=prune_ratio)
+    return model
+
+@register_model
 def tiny_prune_mobilenetv2(prune_ratio=0,**kwargs):
     model=prune_mobilenet(200,64,1,prune_ratio=prune_ratio)
     return model

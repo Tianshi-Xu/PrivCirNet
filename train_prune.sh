@@ -5,6 +5,9 @@ CUDA_VISIBLE_DEVICES=7 python train_prune.py -c configs/datasets/Prune/MBV2/cifa
 
 CUDA_VISIBLE_DEVICES=5 python train_prune.py -c configs/datasets/Prune/MBV2/tiny.yml --model tiny_prune_mobilenetv2 /home/xts/code/dataset/tiny-imagenet-200/
 
+CUDA_VISIBLE_DEVICES=4 python train_prune.py -c configs/datasets/Prune/MBV2/imagenet.yml --model image_prune_mobilenetv2 /opt/dataset/imagenet/
+
+
 # vit SpENCNN, pruning
 CUDA_VISIBLE_DEVICES=5 python train_prune.py -c configs/datasets/Prune/ViT/cifar10.yml --model vit_7_4_32 /home/xts/code/dataset/cifar10/
 

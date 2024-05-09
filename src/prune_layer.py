@@ -149,6 +149,10 @@ class PruneConv2d(nn.Module):
     
     def cal_rot(self):
         d,ri,ro,min_rot = self.he_data
+        if min_rot == 0:
+            print("min_rot",min_rot)
+            self.rot_ratio = 1.0
+            return min_rot
         print("ri,ro:",ri,ro)
         K = self.weight.size(0)
         C = self.weight.size(1)
