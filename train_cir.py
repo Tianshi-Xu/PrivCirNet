@@ -302,6 +302,8 @@ parser.add_argument('--fix_blocksize_list', default="",type=str,
                     help='whether to use dual skip for resnet blocks')
 parser.add_argument('--log_name', default='none', type=str,
                     help='act sparsification pattern')
+parser.add_argument('--use_fusion', default=True,
+                    help='whether to use convbn fusion')
 origin_latency = 0
 def _parse_args():
     # Do we have a config file to parse?
@@ -393,7 +395,7 @@ def main():
     if args.use_kd:
         teacher = create_teacher_model(args)
         teacher.cuda()
-    _logger.info(teacher)
+    
     model = create_model(
         args.model,
         pretrained=args.pretrained,
@@ -641,8 +643,12 @@ def main():
             if isinstance(layer, CirLinear) or isinstance(layer, CirConv2d):
                 layer.fix_block_size = fix_blocksize_list[idx]
                 idx += 1
-            elif isinstance(layer,CirBatchNorm2d):
+            elif args.use_fusion and isinstance(layer,CirBatchNorm2d):
                 layer.block_size = fix_blocksize_list[idx-1]
+    if not args.use_fusion:
+        for name,layer in model.named_modules():
+            if isinstance(layer,CirBatchNorm2d):
+                layer.block_size = 1
     # setup checkpoint saver and eval metric tracking
     
     eval_metric = args.eval_metric
@@ -668,6 +674,7 @@ def main():
             f.write(args_text)
     with open(os.path.join(output_dir, 'model.txt'), 'w') as f:
             f.write(str(model))
+    _logger.info(model)
     try:
         for epoch in range(start_epoch, num_epochs):
             if args.distributed and hasattr(loader_train.sampler, 'set_epoch'):

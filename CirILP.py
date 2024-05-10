@@ -843,7 +843,7 @@ def train_one_epoch(
     total_samples = len(loader.dataset)
     loss = 0
     for batch_idx, (input, target) in enumerate(loader):
-        if args.num_classes == 1000 and batch_idx % 2==1:
+        if (args.num_classes == 1000) and batch_idx % 2==1:
             continue
         if batch_idx>6000 and args.num_classes == 1000:
             total_samples = 3000
@@ -891,11 +891,11 @@ def train_one_epoch(
     if hasattr(optimizer, 'sync_lookahead'):
         optimizer.sync_lookahead()
     _logger.info("len loader.dataset:"+str(total_samples))
-    for param in model.parameters():
-        if param.grad is not None:
-            # _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
-            param.grad.data /= total_samples
-            # _logger.info("mean grad2:"+str(torch.mean(param.grad.data)))
+    # for param in model.parameters():
+    #     if param.grad is not None:
+    #         # _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
+    #         param.grad.data /= total_samples
+    #         # _logger.info("mean grad2:"+str(torch.mean(param.grad.data)))
     return OrderedDict([('loss', losses_m.avg)])
 
 def validate(model, loader, loss_fn, args, amp_autocast=suppress, log_suffix=''):

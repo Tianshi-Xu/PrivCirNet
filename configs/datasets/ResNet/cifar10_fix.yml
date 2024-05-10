@@ -40,24 +40,33 @@ workers: 8
 use_kd: true
 kd_alpha: 4
 seed: 3407
-checkpoint_hist: 3
-# set fix_blocksize to 2/4/8 to run uniform block_size experiments
+checkpoint_hist: 1
+# set fix_blocksize to 2/4/8 and donot set fix_blocksize_list to run uniform block_size experiments
 fix_blocksize: 1
 # PrivCirNet
 # b8
 # fix_blocksize_list: 2,2,2,4,16,4,8,16,16,16,16,16,16,16,16,16,16,16,16
+# b8*1.2
+# fix_blocksize_list: 1,2,2,4,8,4,16,4,16,16,16,16,16,16,16,16,16,16,16
+# b8*1.4
+# fix_blocksize_list: 2,2,2,2,8,4,4,4,8,16,4,16,4,16,16,16,16,16,16
 # b4
 # fix_blocksize_list: 1,1,1,2,4,1,4,4,4,16,4,16,4,16,16,16,16,16,16
+# b4*1.2
+# fix_blocksize_list: 1,1,1,2,4,1,2,1,4,16,4,4,4,4,16,16,16,16,16
+# b4*1.4
+# fix_blocksize_list: 1,1,1,1,4,1,2,1,4,8,1,4,4,4,8,8,16,16,16
 # b2
-# fix_blocksize_list: 1,1,1,1,2,1,1,1,1,2,1,2,1,4,8,8,16,8,16
+# fix_blocksize_list: 1,1,1,1,2,1,1,1,1,2,1,2,1,4,8,8,8,8,16
 # Baseline
 # b8
-fix_blocksize_list: 4,1,2,8,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
+# fix_blocksize_list: 1,2,4,4,16,8,16,16,16,16,16,16,16,16,16,16,16,16,16
 # b4
-# fix_blocksize_list: 16,1,1,1,16,1,2,1,16,16,16,16,16,16,16,16,16,16,16
+fix_blocksize_list: 1,1,1,1,16,1,1,16,16,16,16,16,16,16,16,16,16,16,16
 # b2
 # fix_blocksize_list: 1,1,1,1,2,1,1,1,1,16,1,1,1,1,16,16,16,16,16
-log_name: resnet_c10_b8_base_2
+use_fusion: false
+log_name: resnet_c10_b4_base
 teacher: cifar10_resnet18
 teacher_checkpoint: pretrained/resnet_c10.pth.tar
 initial_checkpoint: pretrained/resnet_c10.pth.tar
