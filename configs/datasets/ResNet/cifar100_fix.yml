@@ -62,11 +62,11 @@ fix_blocksize: 1
 # b8
 # fix_blocksize_list: 2,4,1,4,16,16,16,16,16,16,16,16,16,16,16,16,16,8,16
 # b4
-fix_blocksize_list: 1,1,1,1,16,16,1,1,16,16,16,16,16,16,16,16,16,16,16
+# fix_blocksize_list: 1,1,1,1,16,16,1,1,16,16,16,16,16,16,16,16,16,16,16
 # b2
-# fix_blocksize_list: 1,1,1,1,16,1,1,1,1,16,1,16,1,1,8,2,16,2,16
+fix_blocksize_list: 1,1,1,1,16,1,1,1,1,16,1,16,1,1,8,2,16,2,16
 use_fusion: false
-log_name: resnet_c100_b4_base
+log_name: resnet_c100_b2_base
 teacher: cifar100_resnet18
 teacher_checkpoint: pretrained/resnet_c100.pth.tar
 initial_checkpoint: pretrained/resnet_c100.pth.tar
