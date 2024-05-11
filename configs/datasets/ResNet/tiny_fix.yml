@@ -39,14 +39,14 @@ warmup_lr: 0.00001
 opt: adamw
 smoothing: 0.1
 workers: 4
-seed: 3407
+seed: 111
 checkpoint_hist: 1
 use_kd: true
 kd_alpha: 4
 fix_blocksize: 1
 # PrivCirNet
 # b8
-# fix_blocksize_list: 2,4,4,4,8,4,8,4,16,16,16,16,16,16,8,8,16,8,16
+fix_blocksize_list: 2,4,4,4,8,4,8,4,16,16,16,16,16,16,8,8,16,8,16
 # b8*1.2
 # fix_blocksize_list: 2,2,1,4,8,8,16,4,16,16,16,16,16,16,16,8,16,8,16
 # b8*1.4
@@ -63,11 +63,11 @@ fix_blocksize: 1
 # b8
 # fix_blocksize_list: 1,4,2,4,16,16,16,16,16,16,16,16,16,16,16,16,16,8,16
 # b4
-fix_blocksize_list: 1,1,1,1,16,16,8,1,16,16,16,16,16,16,16,8,16,2,16
+# fix_blocksize_list: 1,1,1,1,16,16,8,1,16,16,16,16,16,16,16,8,16,2,16
 # b2
 # fix_blocksize_list: 1,1,1,1,2,1,4,1,1,16,1,16,1,1,8,2,16,2,16
 use_fusion: false
-log_name: resnet_tiny_b4_base
+log_name: resnet_tiny_b8_3
 teacher: tiny_resnet18
 teacher_checkpoint: pretrained/resnet_tiny.pth.tar
 initial_checkpoint: pretrained/resnet_tiny.pth.tar
