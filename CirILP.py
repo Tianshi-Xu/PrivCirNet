@@ -372,7 +372,7 @@ def cal_latency(layer,HW,C,K,b,space,args):
         b = space[-1]
     n=8192
     num_m=1
-    if layer.padding!=0:
+    if hasattr(layer,"padding") and layer.padding !=0:
         power2 = next_power_2(HW*b)
         if power2>n:
             num_m=int(math.ceil(power2/n))
@@ -764,7 +764,7 @@ def ILP(args,test_loader,model):
         variable[f"b16_{i}"] = LpVariable(f"b16_{i}", 0, 1, cat=LpInteger)
         # variable[f"b32_{i}"] = LpVariable(f"b32_{i}", 0, 1, cat=LpInteger)
     prob = LpProblem("Block_size", LpMinimize)
-    prob += sum(variable[f"b1_{i}"]*latency_weights_b1[i] +variable[f"b2_{i}"]*latency_weights_b2[i] + variable[f"b4_{i}"]*latency_weights_b4[i] +variable[f"b8_{i}"]*latency_weights_b8[i] +variable[f"b16_{i}"]*latency_weights_b16[i] for i in range(num_variable))-origin_latency <= 0.01
+    prob += sum(variable[f"b1_{i}"]*latency_weights_b1[i] +variable[f"b2_{i}"]*latency_weights_b2[i] + variable[f"b4_{i}"]*latency_weights_b4[i] +variable[f"b8_{i}"]*latency_weights_b8[i] +variable[f"b16_{i}"]*latency_weights_b16[i] for i in range(num_variable))-origin_latency*1.5 <= 0.01
 
     
     #one layer only have one blocksize
@@ -818,7 +818,7 @@ def ILP(args,test_loader,model):
     result_string = ','.join(str(item) for item in result)
     _logger.info("result: "+str(result_string))
     _logger.info("origin_latency:"+str(origin_latency))
-    _logger.info("current_latency-origin_latency:"+str(current_latency-origin_latency))
+    _logger.info("current_latency-origin_latency:"+str(current_latency-origin_latency*1.5))
     
 
 # sample on training dataset and get gradients    
@@ -887,6 +887,7 @@ def train_one_epoch(
         # for param in model.parameters():
         #     if param.grad is not None:
         #         _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
+        # break
         
         
     if hasattr(optimizer, 'sync_lookahead'):
