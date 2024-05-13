@@ -412,7 +412,8 @@ def cal_delta_fim_w(layer,block_size,space,device):
 
     layer.fix_block_size = 1
     # the grad need to be computed beforehand in training set
-    delta_fim_w = torch.sum(((layer.weight-cir_weight)**2) * (layer.weight.grad **2))
+    delta_fim_w = torch.sum(((layer.weight-cir_weight)**2) * ((layer.weight.grad*1e5) **2))
+    # _logger.info("grad.mean:"+str(torch.mean((layer.weight.grad*1e5) ** 2)))
     return delta_fim_w.item()
 
 def create_teacher_model(args):
