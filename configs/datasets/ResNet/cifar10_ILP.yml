@@ -43,8 +43,8 @@ fix_blocksize: 1
 # Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
 budget: 2
 # better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: False
-log_name: resnet_c10_ILP
+better_initialization: True
+log_name: resnet_c10_ILP_1.2
 use_kd: true
 kd_alpha: 4
 teacher: cifar10_resnet18
