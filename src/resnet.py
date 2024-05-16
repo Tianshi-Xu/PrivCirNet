@@ -6,6 +6,8 @@ try:
 except ImportError:
     from .registry import register_model
 
+
+
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
     """3x3 convolution with padding"""
     return nn.Conv2d(
@@ -351,3 +353,8 @@ def tiny_resnet18(**kwargs):
     return _resnet(
         BasicBlock, [2, 2, 2, 2], **kwargs
     )
+
+
+# if __name__ == '__main__':
+#     net = tiny_resnet18(num_classes=200)
+#     cal(net)

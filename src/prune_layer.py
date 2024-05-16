@@ -44,7 +44,7 @@ class PruneConv2d(nn.Module):
             diag = torch.diagonal(weight[:,:,:,:],diag_idx,0,1)
             diag2 = torch.diagonal(weight[:,:,:,:],-d+diag_idx,0,1)
             tmp = torch.cat((diag,diag2),dim=2)
-            if torch.mean(torch.abs(tmp))<=threshold:
+            if torch.mean(torch.abs(tmp))<threshold:
                 pdiag = torch.diagonal(mask[:,:,:,:],diag_idx,0,1)
                 pdiag2 = torch.diagonal(mask[:,:,:,:],-d+diag_idx,0,1)
                 pdiag.zero_()
@@ -406,12 +406,12 @@ class PruneLinear(nn.Module):
 
 # for test
 if __name__ == '__main__':
-    # conv = PruneConv2d(96, 96, 1, 1,prune_ratio=88,feature_size=32)
-    # x = torch.randn(1,96,32,32)
-    # y = conv(x)
-    linear = PruneLinear(256,512,True,prune_ratio=88)
-    x = torch.randn(1,65,256)
-    y = linear(x)
-    linear.prune_weight()
+    conv = PruneConv2d(96, 96, 1, 1,prune_ratio=88,feature_size=32)
+    x = torch.randn(1,96,32,32)
+    y = conv(x)
+    # linear = PruneLinear(256,512,True,prune_ratio=88)
+    # x = torch.randn(1,65,256)
+    # y = linear(x)
+    conv.prune_weight()
     
     

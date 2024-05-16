@@ -45,8 +45,8 @@ checkpoint_hist: 1
 budget: 8
 use_kd: true
 kd_alpha: 4
-prune_ratio: 0
-log_name: mbv2_image_prune_b1
+prune_ratio: 75
+log_name: mbv2_image_prune_b4
 teacher: image_mobilenetv2
 teacher_checkpoint: pretrained/mbv2_imagenet.pth
 initial_checkpoint: pretrained/mbv2_imagenet.pth

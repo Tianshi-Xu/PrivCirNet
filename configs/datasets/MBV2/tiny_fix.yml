@@ -32,7 +32,7 @@ lr: 55e-5
 min_lr: 1e-5
 sched: cosine
 weight_decay: 6e-2
-epochs: 300
+epochs: 200
 cooldown_epochs: 10
 warmup_epochs: 10
 warmup_lr: 0.00001
@@ -40,7 +40,7 @@ opt: adamw
 smoothing: 0.1
 workers: 4
 seed: 3407
-checkpoint_hist: 3
+checkpoint_hist: 1
 use_kd: true
 kd_alpha: 4
 fix_blocksize: 4
@@ -60,8 +60,13 @@ fix_blocksize: 4
 # fix_blocksize_list: 1,1,1,1,1,1,16,16,16,16,1,1,16,16,16,16,16,16,1,16,16,16,16,16,1,16,16,16,16,16,16,16
 # b2
 # fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,1,1,16,16,16,16,16,16,1,1,16,16,1,16,1,1,16,16,16,16,1,1
-use_fusion: false
-log_name: mbv2_tiny_fixb4_nofusion
+# for intro
+fix_blocksize_list: 16,8,8,8,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,1,1,1,1,1,1,1,1
+# fix_blocksize_list: 16,8,8,8,16,16,16,16,16,16,16,16,16,16,16,16,1,1,1,1,1,1,1,1,16,16,16,16,16,16,16,16
+# fix_blocksize_list: 16,8,8,8,16,16,16,16,1,1,1,1,1,1,1,1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
+# fix_blocksize_list: 1,1,1,1,1,1,1,1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
+use_fusion: true
+log_name: mbv2_tiny4_intro1
 teacher: tiny_mobilenetv2
 teacher_checkpoint: pretrained/mbv2_tiny.pth.tar
 initial_checkpoint: pretrained/mbv2_tiny.pth.tar

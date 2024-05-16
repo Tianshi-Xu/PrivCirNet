@@ -1,7 +1,7 @@
 # mbv2 fix
-CUDA_VISIBLE_DEVICES=1 python train_cir.py -c configs/datasets/MBV2/cifar10_fix.yml --model c10_cir_mobilenetv2 /home/xts/code/dataset/cifar10/
-CUDA_VISIBLE_DEVICES=2 python train_cir.py -c configs/datasets/MBV2/cifar100_fix.yml --model c100_cir_mobilenetv2 /home/xts/code/dataset/cifar100/
-CUDA_VISIBLE_DEVICES=5 python train_cir.py -c configs/datasets/MBV2/tiny_fix.yml --model tiny_cir_mobilenetv2 /home/xts/code/dataset/tiny-imagenet-200/
+CUDA_VISIBLE_DEVICES=4 python train_cir.py -c configs/datasets/MBV2/cifar10_fix.yml --model c10_cir_mobilenetv2 /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=4 python train_cir.py -c configs/datasets/MBV2/cifar100_fix.yml --model c100_cir_mobilenetv2 /home/xts/code/dataset/cifar100/
+CUDA_VISIBLE_DEVICES=2 python train_cir.py -c configs/datasets/MBV2/tiny_fix.yml --model tiny_cir_mobilenetv2 /home/xts/code/dataset/tiny-imagenet-200/
 
 # resnet fix
 CUDA_VISIBLE_DEVICES=4 python train_cir.py -c configs/datasets/ResNet/cifar10_fix.yml --model cir_cifar10_resnet18 /home/xts/code/dataset/cifar10/

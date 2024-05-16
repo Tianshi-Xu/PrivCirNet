@@ -390,7 +390,6 @@ def main():
     if args.use_kd:
         teacher = create_teacher_model(args)
         teacher.cuda()
-    _logger.info(teacher)
     model = create_model(
         args.model,
         pretrained=args.pretrained,
@@ -664,6 +663,7 @@ def main():
             f.write(args_text)
     with open(os.path.join(output_dir, 'model.txt'), 'w') as f:
             f.write(str(model))
+    _logger.info(model)
     try:
         for epoch in range(start_epoch, num_epochs):
             if args.distributed and hasattr(loader_train.sampler, 'set_epoch'):

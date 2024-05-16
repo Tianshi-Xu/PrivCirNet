@@ -844,9 +844,7 @@ def train_one_epoch(
     total_samples = len(loader.dataset)
     loss = 0
     for batch_idx, (input, target) in enumerate(loader):
-        if (args.num_classes == 1000) and batch_idx % 2==1:
-            continue
-        if batch_idx>6000 and args.num_classes == 1000:
+        if batch_idx>3000 and args.num_classes == 1000:
             total_samples = 3000
             break
         if not args.prefetcher:
