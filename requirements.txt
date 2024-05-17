@@ -1,8 +1,8 @@
-apex==0.9.10.dev0
-fvcore==0.1.5.post20221221
-numpy==1.23.0
-ptflops==0.7.2.2
+numpy==1.26.4
+ptflops==0.7.3
 PuLP==2.8.0
 PyYAML==6.0.1
-timm==0.9.16
-wandb==0.16.6
+timm==1.0.3
+torch==2.3.0
+torchvision==0.18.0
+wandb==0.17.0
