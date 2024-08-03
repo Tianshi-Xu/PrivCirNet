@@ -41,7 +41,7 @@ from timm.scheduler import create_scheduler
 from timm.utils import ApexScaler, NativeScaler
 
 from src import *
-
+from src.utils.utils import KLLossSoft
 try:
     from apex import amp
     from apex.parallel import DistributedDataParallel as ApexDDP
@@ -288,6 +288,17 @@ parser.add_argument('--log-wandb', action='store_true', default=False,
 # Prune
 parser.add_argument('--prune-ratio', type=float, default=0.0)
 
+# KD
+parser.add_argument('--use-kd', action='store_true', default=False,
+                    help='whether to use kd')
+parser.add_argument('--kd-alpha', default=1.0, type=float,
+                    help='KD alpha, soft loss portion (default: 1.0)')
+parser.add_argument('--teacher', default='resnet101', type=str, metavar='MODEL',
+                    help='Name of teacher model (default: "countception"')
+parser.add_argument('--teacher-checkpoint', default='', type=str, metavar='PATH',
+                    help='Initialize teacher model from this checkpoint (default: none)')
+
+
 def _parse_args():
     # Do we have a config file to parse?
     args_config, remaining = config_parser.parse_known_args()
@@ -303,6 +314,26 @@ def _parse_args():
     # Cache the args as a text string to save them in the output dir later
     args_text = yaml.safe_dump(args.__dict__, default_flow_style=False)
     return args, args_text
+
+def create_teacher_model(args):
+    teacher = create_model(
+        args.teacher,
+        pretrained=False,
+        num_classes=args.num_classes,
+        drop_rate=0.,
+        drop_connect_rate=0.,
+        drop_block_rate=0.,
+        global_pool=args.gp,
+        bn_tf=args.bn_tf,
+        bn_momentum=args.bn_momentum,
+        bn_eps=args.bn_eps,
+        # checkpoint_path=args.teacher_checkpoint,
+        # checkpoint_path="",
+    )
+    if args.teacher_checkpoint != "":
+        load_checkpoint(teacher, args.teacher_checkpoint, strict=True)
+    teacher = teacher.eval()
+    return teacher
 
 
 def main():
@@ -352,7 +383,10 @@ def main():
                         "Install NVIDA apex or upgrade to PyTorch 1.6")
 
     random_seed(args.seed, args.rank)
-
+    teacher = None
+    if args.use_kd:
+        teacher = create_teacher_model(args)
+        teacher.cuda()
     model = create_model(
         args.model,
         pretrained=args.pretrained,
@@ -362,12 +396,10 @@ def main():
         drop_path_rate=args.drop_path,
         drop_block_rate=args.drop_block,
         global_pool=args.gp,
-        bn_tf=args.bn_tf,
         bn_momentum=args.bn_momentum,
         bn_eps=args.bn_eps,
         scriptable=args.torchscript,
-        checkpoint_path=args.initial_checkpoint,
-        prune_ratio=args.prune_ratio)
+        checkpoint_path=args.initial_checkpoint)
     if args.num_classes is None:
         assert hasattr(model, 'num_classes'), 'Model must have `num_classes` attr if not set on cmd line/config.'
         args.num_classes = model.num_classes  # FIXME handle model default vs config num_classes more elegantly
@@ -551,6 +583,7 @@ def main():
     )
 
     # setup loss function
+    train_loss_fn_kd = None
     if args.jsd:
         assert num_aug_splits > 1  # JSD only valid with aug splits set
         train_loss_fn = JsdCrossEntropy(num_splits=num_aug_splits, smoothing=args.smoothing).cuda()
@@ -561,7 +594,12 @@ def main():
         train_loss_fn = LabelSmoothingCrossEntropy(smoothing=args.smoothing).cuda()
     else:
         train_loss_fn = nn.CrossEntropyLoss().cuda()
+    if args.use_kd:    
+        train_loss_fn_kd = KLLossSoft().cuda()
     validate_loss_fn = nn.CrossEntropyLoss().cuda()
+    if args.use_kd:
+        _logger.info("Verifying teacher model")
+        validate(teacher, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
 
     # setup checkpoint saver and eval metric tracking
     eval_metric = args.eval_metric
@@ -569,6 +607,7 @@ def main():
     best_epoch = None
     saver = None
     output_dir = None
+    
     if args.rank == 0:
         if args.experiment:
             exp_name = args.experiment
@@ -595,7 +634,7 @@ def main():
             train_metrics = train_one_epoch(
                 epoch, model, loader_train, optimizer, train_loss_fn, args,
                 lr_scheduler=lr_scheduler, saver=saver, output_dir=output_dir,
-                amp_autocast=amp_autocast, loss_scaler=loss_scaler, model_ema=model_ema, mixup_fn=mixup_fn)
+                amp_autocast=amp_autocast, loss_scaler=loss_scaler, model_ema=model_ema, mixup_fn=mixup_fn,teacher=teacher,loss_fn_kd=train_loss_fn_kd)
 
             if args.distributed and args.dist_bn in ('broadcast', 'reduce'):
                 if args.local_rank == 0:
@@ -635,7 +674,7 @@ def main():
 def train_one_epoch(
         epoch, model, loader, optimizer, loss_fn, args,
         lr_scheduler=None, saver=None, output_dir=None, amp_autocast=suppress,
-        loss_scaler=None, model_ema=None, mixup_fn=None):
+        loss_scaler=None, model_ema=None, mixup_fn=None,teacher=None,loss_fn_kd=None):
     if args.mixup_off_epoch and epoch >= args.mixup_off_epoch:
         if args.prefetcher and loader.mixup_enabled:
             loader.mixup_enabled = False
@@ -664,7 +703,11 @@ def train_one_epoch(
 
         with amp_autocast():
             output = model(input)
-            loss = loss_fn(output, target)
+            if args.use_kd:
+                target_t = teacher(input)
+                loss = loss_fn_kd(output, target_t)
+            else:
+                loss = loss_fn(output, target)
 
         if not args.distributed:
             losses_m.update(loss.item(), input.size(0))

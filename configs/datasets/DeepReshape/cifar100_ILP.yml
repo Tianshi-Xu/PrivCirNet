@@ -30,15 +30,23 @@ lr: 55e-5
 min_lr: 1e-5
 sched: cosine
 weight_decay: 6e-2
-epochs: 300
+epochs: 1
 cooldown_epochs: 10
-warmup_epochs: 0
+warmup_epochs: 10
 warmup_lr: 0.00001
 opt: adamw
 smoothing: 0.1
 workers: 4
+seed: 3407
+checkpoint_hist: 1
+fix_blocksize: 1
+# Setting the budget to 2,4,8 to calculate the configuration whose latency is equal to uniform block sizes 2,4,8
+budget: 8
+# better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
+better_initialization: True
+log_name: resnet_c100_553_ILP
 use_kd: true
+kd_alpha: 4
 teacher: cifar100_resnet18_553
 teacher_checkpoint: /home/xts/code/njeans/PrivCirNet/output/train/20240801-144329-cifar100_resnet18_553-32/model_best.pth.tar
-seed: 1101
-checkpoint_hist: 3
+initial_checkpoint: /home/xts/code/njeans/PrivCirNet/output/train/20240801-144329-cifar100_resnet18_553-32/model_best.pth.tar

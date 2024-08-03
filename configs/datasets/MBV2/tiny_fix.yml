@@ -32,7 +32,7 @@ lr: 55e-5
 min_lr: 1e-5
 sched: cosine
 weight_decay: 6e-2
-epochs: 200
+epochs: 300
 cooldown_epochs: 10
 warmup_epochs: 10
 warmup_lr: 0.00001

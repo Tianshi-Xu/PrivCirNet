@@ -133,17 +133,21 @@ class CirLinear(nn.Module):
 class CirConv2d(nn.Module):
     # (feature_size*feature_size,in_features) * (in_features,out_features)-->(m,n)*(n,k)
     # feature_size*feature_size*block_size<=4096
-    def __init__(self, in_features, out_features, kernel_size, stride,fix_block_size=-1,ILP=False):
+    def __init__(self, in_features, out_features, kernel_size, stride, padding, bias, fix_block_size=-1,ILP=False):
         super(CirConv2d, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.kernel_size = kernel_size
         self.stride = stride
+        self.bias = bias
         self.feature_size = None
         self.d1 = None
         self.fix_block_size = fix_block_size
         # print("finetune:",self.finetune)
-        self.padding = kernel_size//2
+        if isinstance(padding, tuple):
+            self.padding = padding[0]
+        else:
+            self.padding = padding
         self.rotate_mat = {}
         self.rev_rotate_mat = {}
         self.search_space = []
@@ -186,10 +190,15 @@ class CirConv2d(nn.Module):
             else:
                 alphas_after=torch.tensor([1 if 2**i==self.fix_block_size else 0 for i in range(len(search_space))]).to(device)
         weight=torch.zeros_like(self.weight).to(device)
+        # print(alphas_after)
+        # print(search_space)
+        # print(self.fix_block_size)
         for idx,block_size in enumerate(search_space):
             if block_size == 1:
                 weight = weight + alphas_after[idx]*self.weight
                 continue
+            # print(alphas_after)
+            # print(idx)
             if torch.abs(alphas_after[idx]) <1e-8:
                 continue
             # print("block_size:",block_size)
@@ -197,6 +206,7 @@ class CirConv2d(nn.Module):
             rev_rotate_mat = self.rev_rotate_mat[block_size].to(device)
             q = self.out_features // block_size
             p = self.in_features // block_size
+            # print("ok")
             # if self.weight_prime is None:
             tmp = self.weight.reshape(q, block_size, p, block_size, self.kernel_size,self.kernel_size)
             # tmp (q,p,b,b,1,1)
@@ -209,10 +219,11 @@ class CirConv2d(nn.Module):
                 assert self.weight.grad is not None
                 if self.grad is None:
                     self.grad = self.weight.grad.clone()
+                # print(self.grad)
                 lambda_tmp = self.grad.reshape(q, block_size, p, block_size, self.kernel_size,self.kernel_size)
                 lambda_tmp = lambda_tmp.permute(0, 2, 1, 3,4,5)
                 # print("grad^2.mean:",lambda_tmp.mean())
-                lambda_tmp = lambda_tmp * 1e5
+                # lambda_tmp = lambda_tmp * 1e5
                 lambda_tmp = lambda_tmp ** 2
                 # print("grad^2.mean:",lambda_tmp.mean())
                 
@@ -229,6 +240,7 @@ class CirConv2d(nn.Module):
                 nan_mask = torch.isnan(weights_cir)
                 nan_indices = torch.nonzero(nan_mask)
                 weights_cir[nan_indices] = weights_cir2[nan_indices]
+                # print(torch.mean(weights_cir))
             weights_cir = weights_cir.repeat(1,1, block_size, 1,1,1)
             weights_cir = weights_cir[:,:, rev_rotate_mat[:, 0], rev_rotate_mat[:, 1],:,:] 
             weights_cir = weights_cir.view(q,p, block_size, block_size, self.kernel_size,self.kernel_size)
@@ -246,11 +258,14 @@ class CirConv2d(nn.Module):
             print("d1:",self.d1)
         self.input = x.detach()
         weight=self.trans_to_cir(x.device)
-        x = F.conv2d(x,weight,None,self.stride,self.padding)
+        if self.bias:
+            x = F.conv2d(x,weight,self.bias,self.stride,self.padding)
+        else:
+            x = F.conv2d(x,weight,None,self.stride,self.padding)
         return x
     
     def extra_repr(self) -> str:
-        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, stride={self.stride}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
+        return f'in_features={self.in_features}, out_features={self.out_features}, kernel_size={self.kernel_size}, stride={self.stride}, padding={self.padding}, fix_block_size={self.fix_block_size}, search_space={self.search_space}'
 
 # make batchnorm layer to be circular, thus we can fuse conv and batchnorm
 class CirBatchNorm2d(nn.BatchNorm2d):

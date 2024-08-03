@@ -424,7 +424,11 @@ def main():
             if isinstance(layer, nn.Linear):
                 hasBias = layer.bias is not None
                 _set_module(model,name,CirLinear(layer.in_features,layer.out_features,args.fix_blocksize,hasBias))
-
+    elif "convnext" in args.model or "RegNet" in args.model:
+        for name,layer in model.named_modules():
+            if isinstance(layer, nn.Conv2d) and layer.groups == 1:
+                _set_module(model,name,CirConv2d(layer.in_channels,layer.out_channels,layer.kernel_size[0],layer.stride,layer.padding,bias=layer.bias,fix_block_size=args.fix_blocksize))
+    
     if args.initial_checkpoint:
         load_checkpoint(model, args.initial_checkpoint,strict=False)
     

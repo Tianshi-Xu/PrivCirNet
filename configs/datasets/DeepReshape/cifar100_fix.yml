@@ -36,9 +36,18 @@ warmup_epochs: 0
 warmup_lr: 0.00001
 opt: adamw
 smoothing: 0.1
-workers: 4
+workers: 8
 use_kd: true
-teacher: cifar100_resnet18_553
-teacher_checkpoint: /home/xts/code/njeans/PrivCirNet/output/train/20240801-144329-cifar100_resnet18_553-32/model_best.pth.tar
+kd_alpha: 4
 seed: 1101
-checkpoint_hist: 3
+checkpoint_hist: 1
+# set fix_blocksize to 2/4/8 to run uniform block_size experiments
+fix_blocksize: 1
+# fix_blocksize_list: 1,1,1,1,1,1,1,1,1,4,4,8,16,16,16,16,16,16,16
+# fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,2,1,2,2,8,8,16,8,16
+fix_blocksize_list: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,4,8
+use_fusion: false
+log_name: resnet_c100_553_b2
+teacher: cifar100_resnet18_553
+teacher_checkpoint: pretrained/resnet_c100_553.pth.tar
+initial_checkpoint: pretrained/resnet_c100_553.pth.tar

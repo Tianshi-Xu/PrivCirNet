@@ -130,6 +130,8 @@ class ResNet(nn.Module):
         down_block_type="default",
         use_dual_skip=False,
         post_res_bn=False,
+        inplanes=64,
+        scales = [2,2,2],
         **kwargs,
     ):
         super(ResNet, self).__init__()
@@ -137,7 +139,7 @@ class ResNet(nn.Module):
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
-        self.inplanes = 64
+        self.inplanes = inplanes
         self.dilation = 1
         if replace_stride_with_dilation is None:
             # each element in the tuple indicates if we should replace
@@ -179,14 +181,14 @@ class ResNet(nn.Module):
             nn.ReLU(inplace=True) if use_relu else nn.PReLU(self.inplanes)
         )
         self.layer1 = self._make_layer(
-            block, 64, layers[0], use_bn=use_bn, use_relu=use_relu,
+            block, inplanes, layers[0], use_bn=use_bn, use_relu=use_relu,
             skip_last_relu=skip_last_relu,
             down_block_type=down_block_type,
             use_dual_skip=use_dual_skip,
             post_res_bn=post_res_bn,
         )
         self.layer2 = self._make_layer(
-            block, 128, layers[1],
+            block, inplanes*scales[0], layers[1],
             stride=2,
             dilate=replace_stride_with_dilation[0],
             use_bn=use_bn,
@@ -197,7 +199,7 @@ class ResNet(nn.Module):
             post_res_bn=post_res_bn,
         )
         self.layer3 = self._make_layer(
-            block, 256, layers[2],
+            block, inplanes*scales[0]*scales[1], layers[2],
             stride=2,
             dilate=replace_stride_with_dilation[1],
             use_bn=use_bn,
@@ -208,7 +210,7 @@ class ResNet(nn.Module):
             post_res_bn=post_res_bn,
         )
         self.layer4 = self._make_layer(
-            block, 512, layers[3],
+            block, inplanes*scales[0]*scales[1]*scales[2], layers[3],
             stride=2,
             dilate=replace_stride_with_dilation[2],
             use_bn=use_bn,
@@ -219,7 +221,7 @@ class ResNet(nn.Module):
             post_res_bn=post_res_bn,
         )
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(inplanes*scales[0]*scales[1]*scales[2] * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -315,8 +317,8 @@ class ResNet(nn.Module):
         return x
 
 
-def _resnet(block, layers, **kwargs):
-    model = ResNet(block, layers, **kwargs)
+def _resnet(block, layers, inplanes=64, scales = [2,2,2], **kwargs):
+    model = ResNet(block, layers, inplanes=inplanes, scales=scales, **kwargs)
     return model
 
 
@@ -344,6 +346,28 @@ def cifar100_resnet18(**kwargs):
     )
     
 @register_model
+def cifar100_resnet18_553(**kwargs):
+    """Constructs a ResNet-18 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _resnet(
+        BasicBlock, [2, 2, 2, 2], inplanes=16, scales=[5,5,3],  **kwargs
+    )
+    
+@register_model
+def cifar100_resnet18_253(**kwargs):
+    """Constructs a ResNet-18 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _resnet(
+        BasicBlock, [2, 2, 2, 2], inplanes=32, scales=[2,5,3], **kwargs
+    )
+    
+@register_model
 def tiny_resnet18(**kwargs):
     """Constructs a ResNet-18 model.
     Args:
@@ -354,7 +378,24 @@ def tiny_resnet18(**kwargs):
         BasicBlock, [2, 2, 2, 2], **kwargs
     )
 
+relu_count = 0
+def count_relu(module, input, output):
+    global relu_count
+    print(len(input))
+    print(input[0].shape)
+    print(input[0].numel())
+    relu_count += input[0].numel()
 
-# if __name__ == '__main__':
-#     net = tiny_resnet18(num_classes=200)
-#     cal(net)
+# 对模型中的所有ReLU层添加钩子
+def register_hooks(model):
+    for module in model.modules():
+        if isinstance(module, torch.nn.ReLU):
+            module.register_forward_hook(count_relu)
+
+
+if __name__ == '__main__':
+    net = cifar100_resnet18_253(num_classes=100)
+    register_hooks(net)
+    x = torch.randn(1, 3, 32, 32)
+    y = net(x)
+    print(relu_count)

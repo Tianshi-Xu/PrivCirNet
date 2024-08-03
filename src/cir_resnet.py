@@ -7,19 +7,19 @@ try:
 except ImportError:
     from .registry import register_model
 
-def cir_conv3x3(in_planes, out_planes, stride=1, fix_block_size=1,ILP=False):
+def cir_conv3x3(in_planes, out_planes, stride=1, fix_block_size=1, dilation=1,ILP=False):
     """3x3 convolution with padding"""
     return CirConv2d(in_planes,
         out_planes,
-        kernel_size=3,
+        kernel_size=3,padding=dilation,bias=False,
         stride=stride,fix_block_size=fix_block_size,ILP=ILP)
 
 
-def cir_conv1x1(in_planes, out_planes, stride=1, fix_block_size=1,ILP=False):
+def cir_conv1x1(in_planes, out_planes, stride=1, fix_block_size=1, dilation=1,ILP=False):
     """1x1 convolution"""
     return CirConv2d(in_planes,
         out_planes,
-        kernel_size=1,
+        kernel_size=1,padding=dilation,bias=False,
         stride=stride,fix_block_size=fix_block_size,ILP=ILP)
 
 
@@ -100,7 +100,8 @@ class CirBasicBlock(nn.Module):
 
         if not self.post_res_bn:
             out = self.bn2(out)
-
+        # print(out.shape)
+        # print(identity.shape)
         out += identity
 
         if self.post_res_bn:
@@ -130,6 +131,8 @@ class CirResNet(nn.Module):
         post_res_bn=False,
         fix_block_size=1,
         ILP=False,
+        inplanes=64,
+        scales = [2,2,2],
         **kwargs,
     ):
         super(CirResNet, self).__init__()
@@ -137,7 +140,7 @@ class CirResNet(nn.Module):
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
-        self.inplanes = 64
+        self.inplanes = inplanes
         self.dilation = 1
         if replace_stride_with_dilation is None:
             # each element in the tuple indicates if we should replace
@@ -179,14 +182,14 @@ class CirResNet(nn.Module):
             nn.ReLU(inplace=True) if use_relu else nn.PReLU(self.inplanes)
         )
         self.layer1 = self._make_layer(
-            block, 64, layers[0], use_bn=use_bn, use_relu=use_relu,
+            block, inplanes, layers[0], use_bn=use_bn, use_relu=use_relu,
             skip_last_relu=skip_last_relu,
             down_block_type=down_block_type,
             use_dual_skip=use_dual_skip,
             post_res_bn=post_res_bn,fix_block_size=fix_block_size,ILP=ILP
         )
         self.layer2 = self._make_layer(
-            block, 128, layers[1],
+            block, inplanes*scales[0], layers[1],
             stride=2,
             dilate=replace_stride_with_dilation[0],
             use_bn=use_bn,
@@ -197,7 +200,7 @@ class CirResNet(nn.Module):
             post_res_bn=post_res_bn,fix_block_size=fix_block_size,ILP=ILP
         )
         self.layer3 = self._make_layer(
-            block, 256, layers[2],
+            block, inplanes*scales[0]*scales[1], layers[2],
             stride=2,
             dilate=replace_stride_with_dilation[1],
             use_bn=use_bn,
@@ -208,7 +211,7 @@ class CirResNet(nn.Module):
             post_res_bn=post_res_bn,fix_block_size=fix_block_size,ILP=ILP
         )
         self.layer4 = self._make_layer(
-            block, 512, layers[3],
+            block, inplanes*scales[0]*scales[1]*scales[2], layers[3],
             stride=2,
             dilate=replace_stride_with_dilation[2],
             use_bn=use_bn,
@@ -219,7 +222,7 @@ class CirResNet(nn.Module):
             post_res_bn=post_res_bn,fix_block_size=fix_block_size,ILP=ILP
         )
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(inplanes*scales[0]*scales[1]*scales[2] * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m,CirConv2d):
@@ -247,7 +250,7 @@ class CirResNet(nn.Module):
             stride = 1
         if stride != 1 or self.inplanes != planes * block.expansion:
             down_block = {
-                "default": [cir_conv1x1(self.inplanes, planes * block.expansion, stride,fix_block_size=fix_block_size,ILP=ILP)],
+                "default": [cir_conv1x1(self.inplanes, planes * block.expansion, stride,dilation=0, fix_block_size=fix_block_size,ILP=ILP)],
                 "avgpool": [
                     nn.AvgPool2d(kernel_size=2, stride=stride),
                     cir_conv1x1(self.inplanes, planes * block.expansion, 1,fix_block_size=fix_block_size,ILP=ILP),
@@ -319,8 +322,8 @@ class CirResNet(nn.Module):
         return x
 
 
-def _cir_resnet(block, layers, fix_block_size=1, ILP=False, **kwargs):
-    model = CirResNet(block, layers, fix_block_size=fix_block_size, ILP=ILP, **kwargs)
+def _cir_resnet(block, layers, fix_block_size=1, ILP=False, inplanes=64, scales = [2,2,2], **kwargs):
+    model = CirResNet(block, layers, fix_block_size=fix_block_size, ILP=ILP, inplanes=inplanes, scales=scales, **kwargs)
     return model
 
 
@@ -336,6 +339,7 @@ def cir_cifar10_resnet18(**kwargs):
         CirBasicBlock, [2, 2, 2, 2], **kwargs
     )
     
+    
 @register_model
 def cir_cifar100_resnet18(**kwargs):
     """Constructs a ResNet-18 model.
@@ -346,7 +350,28 @@ def cir_cifar100_resnet18(**kwargs):
     return _cir_resnet(
         CirBasicBlock, [2, 2, 2, 2], **kwargs
     )
-    
+
+@register_model
+def cir_cifar100_resnet18_553(**kwargs):
+    """Constructs a ResNet-18 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _cir_resnet(
+        CirBasicBlock, [2, 2, 2, 2], inplanes=16, scales=[5,5,3], **kwargs
+    )
+@register_model
+def cir_cifar100_resnet18_253(**kwargs):
+    """Constructs a ResNet-18 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _cir_resnet(
+        CirBasicBlock, [2, 2, 2, 2], inplanes=32, scales=[2,5,3], **kwargs
+    )
+
 @register_model
 def cir_tiny_resnet18(**kwargs):
     """Constructs a ResNet-18 model.

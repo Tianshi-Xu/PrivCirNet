@@ -6,3 +6,5 @@ from .prune_resnet import *
 from .cvt import *
 from .resnet import *
 from .cir_resnet import *
+from .convnext import *
+from .regnet import *

@@ -1,14 +1,14 @@
-dataset: torch/cifar100
-num_classes: 100
+dataset: torch/cifar10
+num_classes: 10
 img_size: 32
 mean:
-    - 0.5071
-    - 0.4867
-    - 0.4408
+    - 0.4914
+    - 0.4822
+    - 0.4465
 std:
-    - 0.2675
-    - 0.2565
-    - 0.2761
+    - 0.2470
+    - 0.2435
+    - 0.2616
 crop_pct: 1.0
 scale:
     - 0.8
@@ -37,8 +37,6 @@ warmup_lr: 0.00001
 opt: adamw
 smoothing: 0.1
 workers: 4
-use_kd: true
-teacher: cifar100_resnet18_553
-teacher_checkpoint: /home/xts/code/njeans/PrivCirNet/output/train/20240801-144329-cifar100_resnet18_553-32/model_best.pth.tar
+use_kd: false
 seed: 1101
 checkpoint_hist: 3
