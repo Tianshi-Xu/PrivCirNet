@@ -219,7 +219,7 @@ class CirConv2d(nn.Module):
                 assert self.weight.grad is not None
                 if self.grad is None:
                     self.grad = self.weight.grad.clone()
-                # print(self.grad)
+                print(self.grad)
                 lambda_tmp = self.grad.reshape(q, block_size, p, block_size, self.kernel_size,self.kernel_size)
                 lambda_tmp = lambda_tmp.permute(0, 2, 1, 3,4,5)
                 # print("grad^2.mean:",lambda_tmp.mean())
@@ -258,7 +258,8 @@ class CirConv2d(nn.Module):
             print("d1:",self.d1)
         self.input = x.detach()
         weight=self.trans_to_cir(x.device)
-        if self.bias:
+        # print(self.bias)
+        if self.bias is not None:
             x = F.conv2d(x,weight,self.bias,self.stride,self.padding)
         else:
             x = F.conv2d(x,weight,None,self.stride,self.padding)

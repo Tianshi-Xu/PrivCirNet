@@ -22,6 +22,7 @@ CUDA_VISIBLE_DEVICES=6 python CirILP.py -c configs/datasets/CVT/tiny_ILP.yml --m
 # convnext 
 
 CUDA_VISIBLE_DEVICES=4 python CirILP.py -c configs/datasets/ConvNeXt/cifar10_ILP.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=5 python CirILP.py -c configs/datasets/ConvNeXt/cifar100_ILP.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar100/
 
 # deepreshape
 CUDA_VISIBLE_DEVICES=2 python CirILP.py -c configs/datasets/DeepReshape/cifar100_ILP.yml --model cir_cifar100_resnet18_553 /home/xts/code/dataset/cifar100/
@@ -30,3 +31,4 @@ CUDA_VISIBLE_DEVICES=2 python CirILP.py -c configs/datasets/DeepReshape/cifar100
 
 # regnet
 CUDA_VISIBLE_DEVICES=1 python CirILP.py -c configs/datasets/RegNet/cifar10_ILP.yml --model RegNetX_200MF /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=1 python CirILP.py -c configs/datasets/RegNet/cifar100_ILP.yml --model RegNetX_200MF /home/xts/code/dataset/cifar100/

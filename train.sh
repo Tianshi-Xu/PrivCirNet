@@ -17,7 +17,9 @@ CUDA_VISIBLE_DEVICES=5 python train.py -c configs/datasets/ResNet/cifar100.yml -
 CUDA_VISIBLE_DEVICES=3 python train.py -c configs/datasets/ResNet/cifar100.yml --model cifar100_resnet18_253 /home/xts/code/dataset/cifar100/
 
 # convnext
-CUDA_VISIBLE_DEVICES=3 python train.py -c configs/datasets/ConvNeXt/convnext_cifar10.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=3 python train.py -c configs/datasets/ConvNeXt/cifar10.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=2 python train.py -c configs/datasets/ConvNeXt/cifar100.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar100/
 
 # regnet
 CUDA_VISIBLE_DEVICES=3 python train.py -c configs/datasets/RegNet/cifar10.yml --model RegNetX_200MF /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=3 python train.py -c configs/datasets/RegNet/cifar100.yml --model RegNetX_200MF /home/xts/code/dataset/cifar100/

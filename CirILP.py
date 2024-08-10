@@ -888,7 +888,7 @@ def train_one_epoch(
         # for param in model.parameters():
         #     if param.grad is not None:
         #         _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
-        # break
+        break
         
         
     if hasattr(optimizer, 'sync_lookahead'):

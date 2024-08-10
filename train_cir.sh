@@ -28,3 +28,5 @@ CUDA_VISIBLE_DEVICES=3 python train_cir.py -c configs/datasets/DeepReshape/cifar
 
 # regnet
 CUDA_VISIBLE_DEVICES=3 python train_cir.py -c configs/datasets/RegNet/cifar10_fix.yml --model RegNetX_200MF /home/xts/code/dataset/cifar10/
+
+CUDA_VISIBLE_DEVICES=4 python train_cir.py -c configs/datasets/RegNet/cifar100_fix.yml --model RegNetX_200MF /home/xts/code/dataset/cifar100/

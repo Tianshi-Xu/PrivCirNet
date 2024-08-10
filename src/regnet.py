@@ -119,7 +119,8 @@ def RegNetX_200MF(**kwargs):
         'bottleneck_ratio': 1,
         'se_ratio': 0,
     }
-    return RegNet(cfg)
+    num_classes = kwargs.get('num_classes')
+    return RegNet(cfg,num_classes=num_classes)
 
 @register_model
 def RegNetX_400MF(**kwargs):

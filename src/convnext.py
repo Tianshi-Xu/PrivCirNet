@@ -57,9 +57,9 @@ def convnext_cifar_nano_hnf(pretrained=False, **kwargs):
         stem_kernel_size=3,
         stem_stride=1,
         **kwargs)
+    num_classes = kwargs.get('num_classes')
     model = _create_convnext_cifar(
         'convnext_nano_hnf',
-        pretrained=pretrained,
         **model_args)
     return model
 
