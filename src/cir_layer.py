@@ -2,6 +2,7 @@ import math,time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import copy
 from torch.nn import init
 
 class CirLinear(nn.Module):
@@ -88,7 +89,9 @@ class CirLinear(nn.Module):
             if self.ILP:
                 # initialization only for ILP
                 assert self.weight.grad is not None
-                lambda_tmp = self.weight.grad.reshape(q, block_size, p, block_size)
+                epsilon = 1e-15  # avoid 0 grad
+                lambda_tmp = torch.where(self.weight.grad != 0, self.weight.grad, epsilon)
+                lambda_tmp = lambda_tmp.reshape(q, block_size, p, block_size)
                 lambda_tmp = lambda_tmp.permute(0, 2, 1, 3)
                 lambda_tmp = lambda_tmp ** 2
                 # print(lambda_tmp[0,0,:,:])
@@ -212,35 +215,39 @@ class CirConv2d(nn.Module):
             # tmp (q,p,b,b,1,1)
             tmp = tmp.permute(0, 2, 1, 3,4,5)
             # print(tmp[0,0,:,:,0,0])
-            weights_rot = tmp[:,:, rotate_mat[:, 0], rotate_mat[:, 1],:,:] 
+            weights_rot = tmp[:,:, rotate_mat[:, 0], rotate_mat[:, 1],:,:].to(device)
             weights_rot = weights_rot.view(q,p, block_size, block_size, self.kernel_size,self.kernel_size)
             if self.ILP:
                 # initialization only for ILP
                 assert self.weight.grad is not None
                 if self.grad is None:
-                    self.grad = self.weight.grad.clone()
-                print(self.grad)
-                lambda_tmp = self.grad.reshape(q, block_size, p, block_size, self.kernel_size,self.kernel_size)
-                lambda_tmp = lambda_tmp.permute(0, 2, 1, 3,4,5)
+                    epsilon = 1e-15  # 你可以根据你的需求来调整这个值
+                    self.grad = torch.where(self.weight.grad != 0, self.weight.grad, epsilon)
+                # print(torch.min(torch.abs(self.grad)))
+                # print("grad.mean:",torch.mean(self.grad))
+                lambda_tmp = self.grad.reshape(q, block_size, p, block_size, self.kernel_size,self.kernel_size).to(device)
+                lambda_tmp = lambda_tmp.permute(0, 2, 1, 3, 4, 5)
                 # print("grad^2.mean:",lambda_tmp.mean())
-                # lambda_tmp = lambda_tmp * 1e5
+                lambda_tmp = lambda_tmp * 1e5
                 lambda_tmp = lambda_tmp ** 2
                 # print("grad^2.mean:",lambda_tmp.mean())
                 
                 # print(lambda_tmp[0,0,:,:,0,0])
-                lambda_rot = lambda_tmp[:,:, rotate_mat[:, 0], rotate_mat[:, 1],:,:]
+                lambda_rot = lambda_tmp[:,:, rotate_mat[:, 0], rotate_mat[:, 1],:,:].to(device)
                 lambda_rot = lambda_rot.view(q,p, block_size, block_size, self.kernel_size,self.kernel_size)
                 weights_cir = lambda_rot*weights_rot
                 weights_cir = torch.sum(weights_cir, dim=2, keepdim=True)/torch.sum(lambda_rot, dim=2, keepdim=True)
+                # print("weights_cir1.mean:",torch.mean(weights_cir))
             else:
                 weights_cir = torch.mean(weights_rot, dim=2, keepdim=True)
             # if the grad are all zero, use the average weights
             if torch.isnan(torch.mean(weights_cir)):
-                weights_cir2 = torch.mean(weights_rot, dim=2, keepdim=True)
+                print("non")
+                weights_cir2 = torch.mean(weights_rot, dim=2, keepdim=True).to(device)
                 nan_mask = torch.isnan(weights_cir)
                 nan_indices = torch.nonzero(nan_mask)
+                # TODO: there is a bug when nan_indices is too large
                 weights_cir[nan_indices] = weights_cir2[nan_indices]
-                # print(torch.mean(weights_cir))
             weights_cir = weights_cir.repeat(1,1, block_size, 1,1,1)
             weights_cir = weights_cir[:,:, rev_rotate_mat[:, 0], rev_rotate_mat[:, 1],:,:] 
             weights_cir = weights_cir.view(q,p, block_size, block_size, self.kernel_size,self.kernel_size)

@@ -25,8 +25,8 @@ cutmix: 1.0
 reprob: 0.25
 remode: pixel
 amp: True
-batch_size: 1024
-lr: 1e-4
+batch_size: 256
+lr: 55e-5
 min_lr: 1e-5
 sched: cosine
 weight_decay: 6e-2
@@ -40,12 +40,13 @@ workers: 4
 seed: 1101
 checkpoint_hist: 3
 fix_blocksize: 1
-budget: 2
-# better_initialization is true means using our initialization method, false means using previous "min |W'-W|^2" method
-better_initialization: True
-log_name: convnext_c100_ILP_2
+fix_blocksize_list: 1,2,2,1,1,1,4,2,2,2,1,4,8,4,8,2,4,2,4,2,4,1,4,1,4,4,4,1,1,1,1,4
+# fix_blocksize_list: 1,2,4,2,2,1,16,4,4,4,2,8,16,16,16,4,8,4,16,4,16,2,4,4,16,8,8,2,2,4,2,8
+# fix_blocksize_list: 1,8,8,2,4,2,16,16,8,8,2,16,16,16,16,8,16,8,16,16,16,4,16,8,16,16,16,4,4,16,4,16
 use_kd: true
+use_fusion: false
 kd_alpha: 4
+log_name: convnext_c100_b2
 teacher: convnext_cifar_nano_hnf
 teacher_checkpoint: pretrained/convnext_c100.pth.tar
 initial_checkpoint: pretrained/convnext_c100.pth.tar

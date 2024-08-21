@@ -836,6 +836,7 @@ def train_one_epoch(
         elif mixup_fn is not None:
             mixup_fn.mixup_enabled = False
     second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
+    print("second_order:"+str(second_order))
     data_time_m = AverageMeter()
     losses_m = AverageMeter()
 
@@ -872,6 +873,7 @@ def train_one_epoch(
         
         # end for
         # break
+        # _logger.info(loss)
         if loss_scaler is not None:
             loss_scaler(
                 loss, optimizer,
@@ -887,8 +889,8 @@ def train_one_epoch(
         # print("------------------")
         # for param in model.parameters():
         #     if param.grad is not None:
-        #         _logger.info("mean grad:"+str(torch.mean(param.grad.data)))
-        break
+        #         _logger.info("max grad:"+str(torch.max(param.grad.data)))
+        #         break
         
         
     if hasattr(optimizer, 'sync_lookahead'):

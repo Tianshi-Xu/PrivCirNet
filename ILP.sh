@@ -20,7 +20,6 @@ CUDA_VISIBLE_DEVICES=5 python CirILP.py -c configs/datasets/CVT/cifar100_ILP.yml
 CUDA_VISIBLE_DEVICES=6 python CirILP.py -c configs/datasets/CVT/tiny_ILP.yml --model cvt_9_12_64 /home/xts/code/dataset/tiny-imagenet-200/
 
 # convnext 
-
 CUDA_VISIBLE_DEVICES=4 python CirILP.py -c configs/datasets/ConvNeXt/cifar10_ILP.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar10/
 CUDA_VISIBLE_DEVICES=5 python CirILP.py -c configs/datasets/ConvNeXt/cifar100_ILP.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar100/
 

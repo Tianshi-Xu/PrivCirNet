@@ -21,6 +21,7 @@ CUDA_VISIBLE_DEVICES=7 python train_cir.py -c configs/datasets/CVT/tiny_fix.yml 
 
 # convnext
 CUDA_VISIBLE_DEVICES=2 python train_cir.py -c configs/datasets/ConvNeXt/cifar10_fix.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar10/
+CUDA_VISIBLE_DEVICES=4 python train_cir.py -c configs/datasets/ConvNeXt/cifar100_fix.yml --model convnext_cifar_nano_hnf /home/xts/code/dataset/cifar100/
 
 # deepreshape
 CUDA_VISIBLE_DEVICES=6 python train_cir.py -c configs/datasets/DeepReshape/cifar100_fix.yml --model cir_cifar100_resnet18_553 /home/xts/code/dataset/cifar100/
