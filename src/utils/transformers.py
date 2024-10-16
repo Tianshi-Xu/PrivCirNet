@@ -81,15 +81,15 @@ class TransformerEncoderLayer(Module):
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                  attention_dropout=0.1, drop_path_rate=0.1):
         super(TransformerEncoderLayer, self).__init__()
-        # self.pre_norm = LayerNorm(d_model)
-        self.pre_norm = BatchNorm1d(d_model)
+        self.pre_norm = LayerNorm(d_model)
+        # self.pre_norm = BatchNorm1d(d_model)
         self.self_attn = Attention(dim=d_model, num_heads=nhead,
                                    attention_dropout=attention_dropout, projection_dropout=dropout)
 
         self.linear1 = Linear(d_model, dim_feedforward)
         self.dropout1 = Dropout(dropout)
-        # self.norm1 = LayerNorm(d_model)
-        self.norm1 = BatchNorm1d(d_model)
+        self.norm1 = LayerNorm(d_model)
+        # self.norm1 = BatchNorm1d(d_model)
         self.linear2 = Linear(dim_feedforward, d_model)
         self.dropout2 = Dropout(dropout)
 
@@ -100,9 +100,10 @@ class TransformerEncoderLayer(Module):
 
     def forward(self, src: torch.Tensor, *args, **kwargs) -> torch.Tensor:
         # print(src.shape)
-        src = src + self.drop_path(self.self_attn(self.pre_norm(src.permute(0,2,1)).permute(0,2,1)))
-        # src = self.norm1(src)
-        src = self.norm1(src.permute(0,2,1)).permute(0,2,1)
+        src = src + self.drop_path(self.self_attn(self.pre_norm(src)))
+        # src = src + self.drop_path(self.self_attn(self.pre_norm(src.permute(0,2,1)).permute(0,2,1)))
+        src = self.norm1(src)
+        # src = self.norm1(src.permute(0,2,1)).permute(0,2,1)
         src2 = self.linear2(self.dropout1(self.activation(self.linear1(src))))
         src = src + self.drop_path(self.dropout2(src2))
         return src
@@ -191,8 +192,8 @@ class TransformerClassifier(Module):
                                     dim_feedforward=dim_feedforward, dropout=dropout,
                                     attention_dropout=attention_dropout, drop_path_rate=dpr[i])
             for i in range(num_layers)])
-        # self.norm = LayerNorm(embedding_dim)
-        self.norm = BatchNorm1d(embedding_dim)
+        self.norm = LayerNorm(embedding_dim)
+        # self.norm = BatchNorm1d(embedding_dim)
 
         self.fc = Linear(embedding_dim, num_classes)
         self.apply(self.init_weight)
@@ -212,7 +213,8 @@ class TransformerClassifier(Module):
 
         for blk in self.blocks:
             x = blk(x)
-        x = self.norm(x.permute(0,2,1)).permute(0,2,1)
+        x = self.norm(x)
+        # x = self.norm(x.permute(0,2,1)).permute(0,2,1)
 
         if self.seq_pool:
             x = torch.matmul(F.softmax(self.attention_pool(x), dim=1).transpose(-1, -2), x).squeeze(-2)
