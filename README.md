@@ -19,8 +19,7 @@ We provide PrivCirNet models which can be downloaded [here](https://drive.google
 
 ## Training Scripts
 ### Run CirILP.py to get block size configuration
-This step is simple and the script is `ILP.sh`.\
-For example, to configure ViT on CIFAR-10, you can run the following command:
+In this step, we load the pretrained model and get the layer-wise block sizes configuration. The script is `ILP.sh`. For example, to configure ViT on CIFAR-10, you can run the following command:
 ```shell
 CUDA_VISIBLE_DEVICES=1 python CirILP.py -c configs/datasets/ViT/cifar10_ILP.yml --model vit_7_4_32 PATH_TO_CIFAR10
 ```
@@ -31,7 +30,9 @@ There are two parameters in the `.yml` file you need to specify:
 - better_initialization. `True` means use the initialization method proposed in PrivCirNet, `False` means use the previous initialization method, i.e., $\min |W'-W|_2^2$.
 
 ### Train the circulant models
-This step is also simple which is the same as training the original models. The script is `train_cir.sh`. For example , to train ViT on CIFAR-10, you can run the following command:
+In this step, we load the pretrained model and train the circulant models with the layer-wise block sizes configuration obtained from the previous step. 
+
+This step is simple which is the same as training the original models. The script is `train_cir.sh`. For example , to train ViT on CIFAR-10, you can run the following command:
 ```shell
 CUDA_VISIBLE_DEVICES=1 python train_cir.py -c configs/datasets/ViT/cifar10_fix.yml --model vit_7_4_32 PATH_TO_CIFAR10
 ```
@@ -58,5 +59,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Citation
 If our work assists your research, feel free to give us a star ⭐ or cite us using:
 ```
-Coming soon
+@misc{xu2024privcirnetefficientprivateinference,
+      title={PrivCirNet: Efficient Private Inference via Block Circulant Transformation}, 
+      author={Tianshi Xu and Lemeng Wu and Runsheng Wang and Meng Li},
+      year={2024},
+      eprint={2405.14569},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR},
+      url={https://arxiv.org/abs/2405.14569}, 
+}
 ```
