@@ -59,13 +59,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Citation
 If our work assists your research, feel free to give us a star ⭐ or cite us using:
 ```
-@misc{xu2024privcirnetefficientprivateinference,
-      title={PrivCirNet: Efficient Private Inference via Block Circulant Transformation}, 
-      author={Tianshi Xu and Lemeng Wu and Runsheng Wang and Meng Li},
-      year={2024},
-      eprint={2405.14569},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2405.14569}, 
+@inproceedings{NEURIPS2024_ca987391,
+ author = {Xu, Tianshi and Wu, Lemeng and Wang, Runsheng and Li, Meng},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Globerson and L. Mackey and D. Belgrave and A. Fan and U. Paquet and J. Tomczak and C. Zhang},
+ pages = {111802--111831},
+ publisher = {Curran Associates, Inc.},
+ title = {PrivCirNet: Efficient Private Inference via Block Circulant Transformation},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/ca9873918aa72e9033041f76e77b5c15-Paper-Conference.pdf},
+ volume = {37},
+ year = {2024}
 }
 ```
