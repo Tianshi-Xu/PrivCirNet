@@ -7,6 +7,7 @@
 
 #### 🔥 PrivCirNet is accepted by NeurIPS'24!!
 #### 🔥 Introducing a network-protocol co-optimization framework for accelerating homomorphic encrypted network inference.
+#### Note: We will open-source the code for private inference within 2025.04, stay tuned!
 
 ## PrivCirNet zoo
 We provide PrivCirNet models which can be downloaded [here](https://drive.google.com/drive/folders/17vV8wySe9fMYi0vgGlHUhuWZtKpW59HC?usp=sharing).
