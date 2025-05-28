@@ -1,13 +1,12 @@
-# PrivCirNet: Efficient Private Inference via Block Circulant Transformation
+<img src="https://raw.githubusercontent.com/Tianshi-Xu/PrivCirNet/main/poster_nips_small.png" width="1000"/>
 
 <div align="center">
-
+ 
 [![arXiv](https://img.shields.io/badge/arXiv%20paper-2404.02905-b31b1b.svg)](https://arxiv.org/abs/2405.14569)&nbsp;
 </div>
 
 #### 🔥 PrivCirNet is accepted by NeurIPS'24!!
 #### 🔥 Introducing a network-protocol co-optimization framework for accelerating homomorphic encrypted network inference.
-
 ## PrivCirNet zoo
 We provide PrivCirNet models which can be downloaded [here](https://drive.google.com/drive/folders/17vV8wySe9fMYi0vgGlHUhuWZtKpW59HC?usp=sharing).
 
