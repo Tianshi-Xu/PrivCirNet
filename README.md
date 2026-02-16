@@ -4,7 +4,8 @@
  
 [![arXiv](https://img.shields.io/badge/arXiv%20paper-2404.02905-b31b1b.svg)](https://arxiv.org/abs/2405.14569)&nbsp;
 </div>
-#### News: We will open-source our private inference code very soon after the 2026 Spring Festival!
+
+#### 🔥 [2026] News: We will open-source our private inference code very soon after the 2026 Spring Festival!
 #### 🔥 PrivCirNet is accepted by NeurIPS'24!!
 #### 🔥 Introducing a network-protocol co-optimization framework for accelerating homomorphic encrypted network inference.
 ## PrivCirNet zoo
